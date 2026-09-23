@@ -10,6 +10,14 @@ export class StartScene extends Phaser.Scene {
   }
 
   create(): void {
+    const hideLoading = this.game.registry.get("hideLoading") as (() => void) | undefined;
+    if (hideLoading) hideLoading();
+    else {
+      const loading = document.getElementById("loading");
+      if (loading) loading.remove();
+      window.__WITNESSED_READY = true;
+    }
+
     addAmbientBackground(this);
     const cx = GAME_WIDTH / 2;
 

@@ -15,30 +15,106 @@
         overflow: hidden;
         height: 100%;
       }
-      #app {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      #root {
+        position: relative;
         width: 100vw;
         height: 100vh;
+        background: #0b0710;
       }
-      canvas {
+      /* Phaser parent must be a simple block box — flex on the parent can break Scale.FIT. */
+      #game {
+        width: 100%;
+        height: 100%;
+      }
+      #game canvas {
         image-rendering: pixelated;
         box-shadow: 0 0 40px rgba(120, 60, 200, 0.35);
         border-radius: 4px;
       }
       #loading {
         position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding: 24px;
+        box-sizing: border-box;
+        background: #0b0710;
         color: #9a7bd0;
         letter-spacing: 2px;
         font-size: 14px;
+        text-align: center;
+        pointer-events: none;
+      }
+      #loading.error {
+        color: #e8a0a0;
+        letter-spacing: 0.5px;
+        line-height: 1.5;
+        pointer-events: auto;
+        white-space: pre-wrap;
+        max-width: 520px;
+        margin: 0 auto;
+      }
+      #loading .hint {
+        color: #6a5a80;
+        font-size: 12px;
+        letter-spacing: 1px;
       }
     </style>
   </head>
   <body>
-    <div id="app">
-      <div id="loading">SUMMONING THE WITNESS…</div>
+    <div id="root">
+      <div id="game"></div>
+      <div id="loading">
+        <div id="loading-status">SUMMONING THE WITNESS…</div>
+        <div class="hint" id="loading-hint">starting local engine</div>
+      </div>
     </div>
+    <script>
+      // Non-module watchdog: if the ES module never boots (blocked script, file://, server down),
+      // surface a useful message instead of an infinite loading screen.
+      (function () {
+        var STATUS_ID = "loading-status";
+        var ROOT_ID = "loading";
+        var READY_FLAG = "__WITNESSED_READY";
+        var FAIL_FLAG = "__WITNESSED_FAIL";
+
+        function showFail(message) {
+          if (window[READY_FLAG]) return;
+          window[FAIL_FLAG] = true;
+          var root = document.getElementById(ROOT_ID);
+          var status = document.getElementById(STATUS_ID);
+          var hint = document.getElementById("loading-hint");
+          if (root) root.classList.add("error");
+          if (status) status.textContent = message;
+          if (hint) {
+            hint.textContent =
+              "Run npm run dev (or npm run preview) and open the printed http:// URL — do not open index.html as a file.";
+          }
+        }
+
+        window.addEventListener("error", function (event) {
+          var msg = (event && event.message) || "Unknown script error";
+          showFail("Failed to start Witnessed:\n" + msg);
+        });
+        window.addEventListener("unhandledrejection", function (event) {
+          var reason = event && event.reason;
+          var msg = reason && (reason.message || String(reason)) || "Unhandled promise rejection";
+          showFail("Failed to start Witnessed:\n" + msg);
+        });
+
+        setTimeout(function () {
+          if (!window[READY_FLAG] && !window[FAIL_FLAG]) {
+            showFail(
+              "Still summoning… the game engine did not start.\nCheck that the Vite server is running and refresh."
+            );
+          }
+        }, 20000);
+      })();
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
