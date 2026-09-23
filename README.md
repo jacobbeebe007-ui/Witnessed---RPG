@@ -3,12 +3,15 @@
 A browser-based, turn-based JRPG inspired by **Dungeons & Dragons** mechanics and the
 overworld-encounter feel of **Golden Sun**, **Final Fantasy**, and **Clair Obscur**.
 Built with **Phaser 3**, **TypeScript**, and **Vite**. All art (characters, enemies,
-tiles) is generated procedurally in code — no external assets required.
+tiles) is generated procedurally in code as **smooth vector 2D art with a dark/high-fantasy
+palette** — no external assets required. Characters are **gender-differentiated**: male
+figures have broader, more masculine builds and armor, while female figures have more
+feminine silhouettes, clothing, and armor.
 
 ## Features
 
 - **Start screen** with New Game / Continue (save is persisted to `localStorage`) and a **Settings** screen (master volume, SFX toggle, difficulty: Story / Normal / Hard).
-- **Character creation**: choose **Male / Female**, one of six classes, and spend a point-buy pool across the six D&D attributes (**STR, DEX, CON, INT, WIS, CHA**). Derived stats (HP, MP, Armor Class, Attack Bonus) update live, with an animated sprite preview.
+- **Character creation**: choose **Male / Female** (which changes the body and armor styling), one of six classes, and spend a point-buy pool across the six D&D attributes (**STR, DEX, CON, INT, WIS, CHA**). Derived stats (HP, MP, Armor Class, Attack Bonus) update live, with an animated sprite preview.
 - **Six classes**, each with a distinct sprite, kit, and starting gear:
   - **Mage / Siren** (the caster is named *Siren* for female characters) — arcane nuker
   - **Rogue** — fast, precise duelist
@@ -57,7 +60,7 @@ src/
 
 ## Roadmap ideas
 
-- Party of up to 4 characters
+- Party of up to 4 characters (systems are already structured for this)
 - Status effects (poison, stun, buffs/debuffs) and elemental resistances
 - More regions, quests, and story beats
 - Sound effects and music

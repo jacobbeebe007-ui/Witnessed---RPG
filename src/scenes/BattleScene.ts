@@ -87,7 +87,7 @@ export class BattleScene extends Phaser.Scene {
     g.fillStyle(0x0a0710, 0.6);
     g.fillEllipse(GAME_WIDTH / 2, 300, GAME_WIDTH * 1.2, 260);
     if (this.isBoss) {
-      const flash = this.add.text(GAME_WIDTH / 2, 40, "BOSS BATTLE", textStyle(22, COLORS.danger, { fontStyle: "bold" })).setOrigin(0.5);
+      const flash = this.add.text(150, 30, "BOSS BATTLE", textStyle(22, COLORS.danger, { fontStyle: "bold" })).setOrigin(0.5);
       this.tweens.add({ targets: flash, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
     }
   }

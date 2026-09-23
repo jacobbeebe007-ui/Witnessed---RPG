@@ -180,10 +180,11 @@ export class OverworldScene extends Phaser.Scene {
     let sx = GameState.overworld.hasSpawn ? GameState.overworld.x : 3 * TILE;
     let sy = GameState.overworld.hasSpawn ? GameState.overworld.y : 15 * TILE;
     this.player = this.physics.add.sprite(sx, sy, charKey(p.classId, p.gender, 0)).setScale(0.32);
-    // Collision box near the feet (source-pixel units on the 108x156 texture).
+    // Collision box near the feet. Arcade scales the body by the sprite scale
+    // (0.32), so source 68x44 -> ~21x14 world px, centered and lowered to the feet.
     const pbody = this.player.body as Phaser.Physics.Arcade.Body;
-    pbody.setSize(44, 26);
-    pbody.setOffset(32, 120);
+    pbody.setSize(68, 44);
+    pbody.setOffset(20, 113);
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(10);
     this.physics.add.collider(this.player, this.obstacles);
