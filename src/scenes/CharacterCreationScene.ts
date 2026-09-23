@@ -78,10 +78,12 @@ export class CharacterCreationScene extends Phaser.Scene {
       const role = this.add.text(50, 34, def.role, textStyle(12, COLORS.textDim));
       card.add([swatch, nm, role]);
       card.setSize(220, 58);
-      card.setInteractive(new Phaser.Geom.Rectangle(0, 0, 220, 58), Phaser.Geom.Rectangle.Contains);
-      card.on("pointerdown", () => this.selectClass(id));
-      card.on("pointerover", () => this.drawCard(card, id, true));
-      card.on("pointerout", () => this.drawCard(card, id, this.classId === id));
+      // Reliable world-space hit target (Container.setInteractive hit-areas are flaky).
+      const hit = this.add.rectangle(110, 29, 220, 58, 0x000000, 0).setInteractive({ useHandCursor: true });
+      card.add(hit);
+      hit.on("pointerdown", () => this.selectClass(id));
+      hit.on("pointerover", () => this.drawCard(card, id, true));
+      hit.on("pointerout", () => this.drawCard(card, id, this.classId === id));
       this.classCards[id] = card;
       this.drawCard(card, id, this.classId === id);
     });
@@ -143,9 +145,9 @@ export class CharacterCreationScene extends Phaser.Scene {
       const info = ATTRIBUTES[key];
       this.add.text(x, ry, info.abbr, textStyle(16, COLORS.text, { fontStyle: "bold" })).setOrigin(0, 0.5);
       this.add.text(x + 42, ry, info.blurb, textStyle(10, COLORS.textDim)).setOrigin(0, 0.5);
-      const minus = new Button(this, x + 196, ry, "–", () => this.adjust(key, -1), { width: 30, height: 28, size: 20, fill: COLORS.panelLight });
+      const minus = new Button(this, x + 188, ry, "–", () => this.adjust(key, -1), { width: 34, height: 30, size: 22, fill: COLORS.panelLight });
       const value = this.add.text(x + 228, ry, "8", textStyle(18, COLORS.accent2, { fontStyle: "bold" })).setOrigin(0.5);
-      const plus = new Button(this, x + 260, ry, "+", () => this.adjust(key, 1), { width: 30, height: 28, size: 20, fill: COLORS.panelLight });
+      const plus = new Button(this, x + 268, ry, "+", () => this.adjust(key, 1), { width: 34, height: 30, size: 22, fill: COLORS.panelLight });
       this.attrRows[key] = { value, minus, plus };
     });
 
