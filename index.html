@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Witnessed — A Turn-Based RPG</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0b0710;
+        color: #e8e0f0;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        overflow: hidden;
+        height: 100%;
+      }
+      #app {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+      }
+      canvas {
+        image-rendering: pixelated;
+        box-shadow: 0 0 40px rgba(120, 60, 200, 0.35);
+        border-radius: 4px;
+      }
+      #loading {
+        position: absolute;
+        color: #9a7bd0;
+        letter-spacing: 2px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="loading">SUMMONING THE WITNESS…</div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
