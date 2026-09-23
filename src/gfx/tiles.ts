@@ -84,8 +84,14 @@ function town(): HTMLCanvasElement {
   return canvas;
 }
 
+function blank(): HTMLCanvasElement {
+  // Fully transparent tile used for invisible collision bodies.
+  return makeCanvas(TILE, TILE).canvas;
+}
+
 export function buildTileTextures(scene: Phaser.Scene): void {
   const defs: Record<string, () => HTMLCanvasElement> = {
+    tile_blank: blank,
     tile_meadow: () => grass(0x6aa84a),
     tile_forest: () => grass(0x3f7d3a),
     tile_wastes: () => grass(0x9a8a5a),

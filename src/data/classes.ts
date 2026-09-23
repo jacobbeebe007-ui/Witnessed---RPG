@@ -39,7 +39,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingWeapon: "oak_staff",
     startingArmor: "cloth_robe",
     palette: [0x7b4bff, 0x3a2a6a, 0xffcf5c],
-    suggested: { int: 5, wis: 3, con: 2, cha: 2 },
+    suggested: { int: 4, wis: 2, con: 2 },
   },
   rogue: {
     id: "rogue",
@@ -55,7 +55,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingWeapon: "twin_daggers",
     startingArmor: "leather_vest",
     palette: [0x3ad0a0, 0x1f3a34, 0xe8e0f0],
-    suggested: { dex: 6, con: 3, str: 2, cha: 1 },
+    suggested: { dex: 4, con: 2, str: 2 },
   },
   ranger: {
     id: "ranger",
@@ -71,7 +71,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingWeapon: "hunting_bow",
     startingArmor: "leather_vest",
     palette: [0x4f9d3a, 0x274d1e, 0xc9a55c],
-    suggested: { dex: 5, wis: 3, con: 3, str: 1 },
+    suggested: { dex: 4, wis: 2, con: 2 },
   },
   knight: {
     id: "knight",
@@ -87,7 +87,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingWeapon: "longsword",
     startingArmor: "chainmail",
     palette: [0x9aa7c7, 0x3a4360, 0xffcf5c],
-    suggested: { str: 5, con: 5, wis: 2 },
+    suggested: { str: 4, con: 3, wis: 1 },
   },
   brute: {
     id: "brute",
@@ -103,7 +103,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingWeapon: "great_axe",
     startingArmor: "hide_armor",
     palette: [0xc7563a, 0x5a2418, 0xe8c07a],
-    suggested: { str: 6, con: 5, dex: 1 },
+    suggested: { str: 4, con: 4 },
   },
   inquisitor: {
     id: "inquisitor",
@@ -119,7 +119,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingWeapon: "war_mace",
     startingArmor: "chainmail",
     palette: [0xd0b04a, 0x4a3a1a, 0xe8e0f0],
-    suggested: { wis: 5, str: 3, con: 3, cha: 1 },
+    suggested: { wis: 4, str: 2, con: 2 },
   },
 };
 

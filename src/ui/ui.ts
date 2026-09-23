@@ -36,6 +36,7 @@ export interface ButtonOpts {
 export class Button extends Phaser.GameObjects.Container {
   private bg: Phaser.GameObjects.Graphics;
   private label: Phaser.GameObjects.Text;
+  private hit: Phaser.GameObjects.Rectangle;
   private bw: number;
   private bh: number;
   private fillColor: number;
@@ -59,14 +60,17 @@ export class Button extends Phaser.GameObjects.Container {
     this.redraw(false);
 
     this.setSize(this.bw, this.bh);
-    this.setInteractive(new Phaser.Geom.Rectangle(-this.bw / 2, -this.bh / 2, this.bw, this.bh), Phaser.Geom.Rectangle.Contains);
-    this.on("pointerover", () => !this._disabled && this.redraw(true));
-    this.on("pointerout", () => this.redraw(false));
-    this.on("pointerdown", () => {
+    // Use an explicit interactive Rectangle as the hit target. Rectangles have
+    // reliable world-space input hit-testing even when nested in a container.
+    this.hit = scene.add.rectangle(0, 0, this.bw, this.bh, 0x000000, 0).setInteractive({ useHandCursor: true });
+    this.add(this.hit);
+    this.hit.on("pointerover", () => !this._disabled && this.redraw(true));
+    this.hit.on("pointerout", () => this.redraw(false));
+    this.hit.on("pointerdown", () => {
       if (this._disabled) return;
       this.setScale(0.96);
     });
-    this.on("pointerup", () => {
+    this.hit.on("pointerup", () => {
       if (this._disabled) return;
       this.setScale(1);
       this.onClick();

@@ -155,7 +155,7 @@ export class OverworldScene extends Phaser.Scene {
         if (t === "tree" || t === "water" || t === "mountain") {
           const key = t === "tree" ? "tile_tree" : t === "water" ? "tile_water" : "tile_mountain";
           this.add.image(wx, wy, key).setOrigin(0);
-          const ob = this.obstacles.create(wx + TILE / 2, wy + TILE / 2, undefined as never) as Phaser.Physics.Arcade.Sprite;
+          const ob = this.obstacles.create(wx + TILE / 2, wy + TILE / 2, "tile_blank") as Phaser.Physics.Arcade.Sprite;
           ob.setVisible(false).setSize(TILE, TILE).refreshBody();
         } else if (t === "town") {
           this.add.image(wx, wy, "tile_town").setOrigin(0);
