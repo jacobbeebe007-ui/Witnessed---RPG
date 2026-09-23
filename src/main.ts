@@ -1,20 +1,4 @@
-import Phaser from "phaser";
-import { GAME_WIDTH, GAME_HEIGHT, COLORS } from "./config";
-import { BootScene } from "./scenes/BootScene";
-import { StartScene } from "./scenes/StartScene";
-import { SettingsScene } from "./scenes/SettingsScene";
-import { CharacterCreationScene } from "./scenes/CharacterCreationScene";
-import { OverworldScene } from "./scenes/OverworldScene";
-import { BattleScene } from "./scenes/BattleScene";
-import { ShopScene } from "./scenes/ShopScene";
-
-declare global {
-  interface Window {
-    __WITNESSED_READY?: boolean;
-    __WITNESSED_FAIL?: boolean;
-    __WITNESSED_GAME?: Phaser.Game;
-  }
-}
+import type Phaser from "phaser";
 
 function setLoadingStatus(text: string): void {
   const status = document.getElementById("loading-status");
@@ -36,7 +20,8 @@ function showBootError(err: unknown): void {
   if (loading) loading.classList.add("error");
   if (status) status.textContent = "Failed to start Witnessed:\n" + message;
   if (hint) {
-    hint.textContent = "Open the browser console for details, then refresh after fixing the error.";
+    hint.textContent =
+      "Run npm run dev (or npm run preview) and open the printed http:// URL — do not open index.html as a file.";
   }
   console.error("[Witnessed] boot failed", err);
 }
@@ -49,6 +34,21 @@ function nextFrame(): Promise<void> {
 async function startGame(): Promise<void> {
   setLoadingStatus("SUMMONING THE WITNESS…");
   await nextFrame();
+
+  setLoadingStatus("LOADING ENGINE…");
+  // Dynamic import so a missing/blocked Phaser bundle surfaces as a caught error
+  // instead of a silent forever-loading HTML overlay.
+  const PhaserMod = await import("phaser");
+  const Phaser = PhaserMod.default;
+
+  const { GAME_WIDTH, GAME_HEIGHT, COLORS } = await import("./config");
+  const { BootScene } = await import("./scenes/BootScene");
+  const { StartScene } = await import("./scenes/StartScene");
+  const { SettingsScene } = await import("./scenes/SettingsScene");
+  const { CharacterCreationScene } = await import("./scenes/CharacterCreationScene");
+  const { OverworldScene } = await import("./scenes/OverworldScene");
+  const { BattleScene } = await import("./scenes/BattleScene");
+  const { ShopScene } = await import("./scenes/ShopScene");
 
   // Prefer Canvas: this is a 2D pixel-art game, and WebGL software fallbacks
   // are increasingly flaky in VMs / locked-down browsers (can hang before first paint).
