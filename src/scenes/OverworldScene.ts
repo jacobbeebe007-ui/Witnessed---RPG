@@ -57,7 +57,7 @@ export class OverworldScene extends Phaser.Scene {
     }
     this.transitioning = false;
     this.distanceAcc = 0;
-    this.nextEncounter = Phaser.Math.Between(140, 260);
+    this.nextEncounter = Phaser.Math.Between(320, 560);
 
     this.buildMap();
     this.buildPlayer();
@@ -310,7 +310,7 @@ export class OverworldScene extends Phaser.Scene {
       this.distanceAcc += (speed * delta) / 1000;
       if (this.distanceAcc >= this.nextEncounter) {
         this.distanceAcc = 0;
-        this.nextEncounter = Phaser.Math.Between(150, 300);
+        this.nextEncounter = Phaser.Math.Between(320, 560);
         this.tryEncounter();
         return;
       }
@@ -347,7 +347,7 @@ export class OverworldScene extends Phaser.Scene {
 
   private tryEncounter(): void {
     const region = this.regionAt(Math.floor(this.player.x / TILE));
-    const chance = region === "meadow" ? 0.5 : region === "forest" ? 0.65 : 0.8;
+    const chance = region === "meadow" ? 0.35 : region === "forest" ? 0.5 : 0.65;
     if (Math.random() > chance) return;
     const table = ENCOUNTER_TABLES[region];
     const count = Math.random() < 0.4 ? 2 : 1;
