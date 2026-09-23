@@ -38,7 +38,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingSkills: ["firebolt", "mend"],
     startingWeapon: "oak_staff",
     startingArmor: "cloth_robe",
-    palette: [0x7b4bff, 0x3a2a6a, 0xffcf5c],
+    palette: [0x5b3a9e, 0x241640, 0xd4af5a],
     suggested: { int: 4, wis: 2, con: 2 },
   },
   rogue: {
@@ -54,7 +54,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingSkills: ["backstab"],
     startingWeapon: "twin_daggers",
     startingArmor: "leather_vest",
-    palette: [0x3ad0a0, 0x1f3a34, 0xe8e0f0],
+    palette: [0x4a4460, 0x17141f, 0x9a3b3b],
     suggested: { dex: 4, con: 2, str: 2 },
   },
   ranger: {
@@ -70,7 +70,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingSkills: ["aimed_shot"],
     startingWeapon: "hunting_bow",
     startingArmor: "leather_vest",
-    palette: [0x4f9d3a, 0x274d1e, 0xc9a55c],
+    palette: [0x3e6b3a, 0x1e2b18, 0xb08a4a],
     suggested: { dex: 4, wis: 2, con: 2 },
   },
   knight: {
@@ -86,7 +86,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingSkills: ["smite", "guard"],
     startingWeapon: "longsword",
     startingArmor: "chainmail",
-    palette: [0x9aa7c7, 0x3a4360, 0xffcf5c],
+    palette: [0x8a94a8, 0x2c3346, 0xd4af5a],
     suggested: { str: 4, con: 3, wis: 1 },
   },
   brute: {
@@ -102,7 +102,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingSkills: ["crush"],
     startingWeapon: "great_axe",
     startingArmor: "hide_armor",
-    palette: [0xc7563a, 0x5a2418, 0xe8c07a],
+    palette: [0x8f3f2c, 0x2a1712, 0xc08a4a],
     suggested: { str: 4, con: 4 },
   },
   inquisitor: {
@@ -118,7 +118,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     startingSkills: ["judgment", "purge", "focus"],
     startingWeapon: "war_mace",
     startingArmor: "chainmail",
-    palette: [0xd0b04a, 0x4a3a1a, 0xe8e0f0],
+    palette: [0x6e2b2b, 0x241820, 0xd4af5a],
     suggested: { wis: 4, str: 2, con: 2 },
   },
 };

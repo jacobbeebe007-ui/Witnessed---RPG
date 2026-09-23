@@ -113,8 +113,8 @@ export class CharacterCreationScene extends Phaser.Scene {
     });
 
     // Sprite preview on a pedestal
-    this.add.ellipse(cx, 250, 90, 22, 0x000000, 0.35);
-    this.preview = this.add.sprite(cx, 210, charKey(this.classId, this.gender, 0)).setScale(4.2).setOrigin(0.5, 1);
+    this.add.ellipse(cx, 252, 84, 20, 0x000000, 0.4);
+    this.preview = this.add.sprite(cx, 256, charKey(this.classId, this.gender, 0)).setScale(0.92).setOrigin(0.5, 1);
     ensureWalkAnim(this, this.classId, this.gender);
     this.preview.play(`idle_${this.classId}_${this.gender}`);
 

@@ -99,13 +99,13 @@ export class BattleScene extends Phaser.Scene {
     pending.enemies.forEach((def, i) => {
       const hpMult = (def.boss ? 1 : 1 + 0.06 * (level - 1)) * diff;
       const inst = spawnEnemy(def, hpMult);
-      const x = n === 1 ? GAME_WIDTH / 2 + 120 : GAME_WIDTH / 2 + 30 + i * 190;
-      const y = 175 + (i % 2) * 20;
-      const scale = def.boss ? 2.6 : 1.9;
+      const x = n === 1 ? GAME_WIDTH / 2 + 130 : GAME_WIDTH / 2 + 40 + i * 195;
+      const y = def.boss ? 215 : 190 + (i % 2) * 16;
+      const scale = def.boss ? 1.3 : 0.92;
       const sprite = this.add.sprite(x, y, enemyKey(def.id, 0)).setScale(scale).setOrigin(0.5, 1);
       sprite.play(`enemyidle_${def.id}`);
       sprite.setInteractive({ useHandCursor: true });
-      const label = this.add.text(x, y - def.hp * 0 - (def.boss ? 130 : 90), def.name, textStyle(13, COLORS.text, { fontStyle: "bold" })).setOrigin(0.5);
+      const label = this.add.text(x, y - (def.boss ? 186 : 130), def.name, textStyle(13, COLORS.text, { fontStyle: "bold" })).setOrigin(0.5);
       const bar = this.add.graphics();
       const view: EnemyView = { inst, sprite, bar, label, x, y };
       sprite.on("pointerdown", () => this.onEnemyClicked(view));
@@ -118,7 +118,7 @@ export class BattleScene extends Phaser.Scene {
 
   private drawEnemyBar(v: EnemyView): void {
     const w = v.inst.def.boss ? 160 : 96;
-    const topY = v.y - (v.inst.def.boss ? 120 : 84);
+    const topY = v.y - (v.inst.def.boss ? 172 : 116);
     v.label.setY(topY - 16);
     const g = v.bar;
     g.clear();
@@ -133,9 +133,9 @@ export class BattleScene extends Phaser.Scene {
 
   private buildPlayer(): void {
     const p = GameState.player!;
-    this.playerSprite = this.add.sprite(190, 330, charKey(p.classId, p.gender, 0)).setScale(3.6).setOrigin(0.5, 1);
+    this.playerSprite = this.add.sprite(195, 336, charKey(p.classId, p.gender, 0)).setScale(0.95).setOrigin(0.5, 1);
     this.playerSprite.play(`idle_${p.classId}_${p.gender}`);
-    this.add.ellipse(190, 332, 90, 20, 0x000000, 0.4).setDepth(-1);
+    this.add.ellipse(195, 336, 70, 16, 0x000000, 0.4).setDepth(-1);
   }
 
   // ---- UI ----
@@ -499,7 +499,7 @@ export class BattleScene extends Phaser.Scene {
   private applyDamageToEnemy(v: EnemyView, dmg: number, crit: boolean): void {
     this.time.delayedCall(150, () => {
       v.inst.hp = Math.max(0, v.inst.hp - dmg);
-      this.floatText(v.x, v.y - (v.inst.def.boss ? 90 : 60), `${dmg}`, crit ? COLORS.accent2 : COLORS.text, crit);
+      this.floatText(v.x, v.y - (v.inst.def.boss ? 110 : 80), `${dmg}`, crit ? COLORS.accent2 : COLORS.text, crit);
       this.tweens.add({ targets: v.sprite, x: v.x + 24, duration: 70, yoyo: true });
       v.sprite.setTint(0xffffff);
       this.time.delayedCall(80, () => v.sprite.clearTint());

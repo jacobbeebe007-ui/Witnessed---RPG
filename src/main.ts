@@ -14,8 +14,9 @@ const config: Phaser.Types.Core.GameConfig = {
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
   backgroundColor: "#" + COLORS.bg.toString(16).padStart(6, "0"),
-  pixelArt: true,
-  roundPixels: true,
+  pixelArt: false,
+  roundPixels: false,
+  antialias: true,
   physics: {
     default: "arcade",
     arcade: {
@@ -27,7 +28,7 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  render: { antialias: false },
+  render: { antialias: true, roundPixels: false },
   scene: [BootScene, StartScene, SettingsScene, CharacterCreationScene, OverworldScene, BattleScene, ShopScene],
 };
 

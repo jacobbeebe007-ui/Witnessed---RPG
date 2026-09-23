@@ -179,8 +179,11 @@ export class OverworldScene extends Phaser.Scene {
     ensureWalkAnim(this, p.classId, p.gender);
     let sx = GameState.overworld.hasSpawn ? GameState.overworld.x : 3 * TILE;
     let sy = GameState.overworld.hasSpawn ? GameState.overworld.y : 15 * TILE;
-    this.player = this.physics.add.sprite(sx, sy, charKey(p.classId, p.gender, 0)).setScale(1.4);
-    this.player.setSize(16, 10).setOffset(4, 22);
+    this.player = this.physics.add.sprite(sx, sy, charKey(p.classId, p.gender, 0)).setScale(0.32);
+    // Collision box near the feet (source-pixel units on the 108x156 texture).
+    const pbody = this.player.body as Phaser.Physics.Arcade.Body;
+    pbody.setSize(44, 26);
+    pbody.setOffset(32, 120);
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(10);
     this.physics.add.collider(this.player, this.obstacles);
@@ -195,7 +198,7 @@ export class OverworldScene extends Phaser.Scene {
     for (const b of defs) {
       if (GameState.overworld.defeatedBosses.includes(b.id)) continue;
       const def = ENEMIES[b.id];
-      const spr = this.add.sprite(b.tx * TILE, b.ty * TILE, enemyKey(b.id, 0)).setScale(1.1).setDepth(9);
+      const spr = this.add.sprite(b.tx * TILE, b.ty * TILE, enemyKey(b.id, 0)).setScale(0.42).setDepth(9);
       spr.play(`enemyidle_${b.id}`);
       const marker: BossMarker = { id: b.id, sprite: spr };
       // wander
