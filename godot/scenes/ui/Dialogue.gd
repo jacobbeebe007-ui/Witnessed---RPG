@@ -21,8 +21,8 @@ func _ready() -> void:
 	_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_panel.offset_left = 24
 	_panel.offset_right = -24
-	_panel.offset_top = -92
-	_panel.offset_bottom = -10
+	_panel.offset_top = -112
+	_panel.offset_bottom = -8
 	_panel.visible = false
 	add_child(_panel)
 	var v := VBoxContainer.new()
@@ -34,7 +34,7 @@ func _ready() -> void:
 	_text.bbcode_enabled = true
 	_text.fit_content = false
 	_text.scroll_active = false
-	_text.custom_minimum_size = Vector2(0, 44)
+	_text.custom_minimum_size = Vector2(0, 40)
 	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(_text)
 	_choices = HBoxContainer.new()

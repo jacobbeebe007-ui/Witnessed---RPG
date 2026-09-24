@@ -248,7 +248,7 @@ const ENEMIES := {
 
 # region -> encounter table [enemy ids], backdrop, base level, encounter rate per step
 const REGIONS := {
-	"meadow":  {"name": "Hollowmere Meadows", "table": ["slime", "slime", "goblin", "wolf"], "backdrop": "meadow", "rate": 0.06, "min_group": 1, "max_group": 3},
+	"meadow":  {"name": "Hollowmere Meadows", "table": ["slime", "slime", "slime", "goblin", "goblin", "wolf"], "backdrop": "meadow", "rate": 0.06, "min_group": 1, "max_group": 2},
 	"forest":  {"name": "Thornwood", "table": ["wolf", "myconid", "goblin", "bandit", "treant"], "backdrop": "forest", "rate": 0.07, "min_group": 1, "max_group": 3},
 	"wastes":  {"name": "Ashen Wastes", "table": ["scorpion", "skeleton", "harpy", "cultist"], "backdrop": "wastes", "rate": 0.07, "min_group": 2, "max_group": 3},
 	"ruins":   {"name": "Sunken Ruins", "table": ["skeleton", "wraith", "cultist", "golem"], "backdrop": "ruins", "rate": 0.08, "min_group": 2, "max_group": 4},

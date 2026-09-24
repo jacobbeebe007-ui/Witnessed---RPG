@@ -15,16 +15,16 @@ func _ready() -> void:
 	title.add_theme_font_size_override("font_size", 22)
 	title.add_theme_color_override("font_color", Color("c04a5a"))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.set_anchors_and_offsets_preset(PRESET_TOP_WIDE)
-	title.offset_top = 90
+	title.position = Vector2(0, 90)
+	title.size = Vector2(640, 32)
 	add_child(title)
 
 	var sub := Label.new()
 	sub.text = "Your party has fallen. The Witness laughs somewhere beyond the dunes."
 	sub.add_theme_color_override("font_color", Color(0.75, 0.7, 0.85))
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub.set_anchors_and_offsets_preset(PRESET_TOP_WIDE)
-	sub.offset_top = 130
+	sub.position = Vector2(0, 130)
+	sub.size = Vector2(640, 32)
 	add_child(sub)
 
 	var menu := VBoxContainer.new()

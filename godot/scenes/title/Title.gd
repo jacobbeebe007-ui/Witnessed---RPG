@@ -38,8 +38,8 @@ func _ready() -> void:
 	title.add_theme_constant_override("shadow_offset_x", 3)
 	title.add_theme_constant_override("shadow_offset_y", 3)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.set_anchors_and_offsets_preset(PRESET_TOP_WIDE)
-	title.offset_top = 112
+	title.position = Vector2(0, 112)
+	title.size = Vector2(640, 32)
 	add_child(title)
 
 	var sub := Label.new()
@@ -47,8 +47,8 @@ func _ready() -> void:
 	sub.add_theme_font_size_override("font_size", 22)
 	sub.add_theme_color_override("font_color", Color("d8c8ff"))
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub.set_anchors_and_offsets_preset(PRESET_TOP_WIDE)
-	sub.offset_top = 146
+	sub.position = Vector2(0, 146)
+	sub.size = Vector2(640, 32)
 	add_child(sub)
 
 	_menu = VBoxContainer.new()

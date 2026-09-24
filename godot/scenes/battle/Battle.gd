@@ -31,7 +31,7 @@ var log_label: Label
 var timeline_box: HBoxContainer
 var party_panel: VBoxContainer
 var command_root: Control
-var main_menu: VBoxContainer
+var main_menu: GridContainer
 var sub_panel: VBoxContainer
 var sub_scroll: ScrollContainer
 var sub_list: VBoxContainer
@@ -90,10 +90,30 @@ class QteRing extends Node2D:
 func _ready() -> void:
 	var pb: Dictionary = GameState.pending_battle
 	if pb.is_empty():
-		pb = {"enemies": ["slime", "slime"], "backdrop": "meadow", "boss_flag": "", "boss": false, "region": "meadow"}
+		# Running the scene directly (F6 / command line): build a demo encounter.
+		# WITNESSED_DEMO_ENEMIES="boss_drake" WITNESSED_DEMO_PARTY="knight,mage,ranger,inquisitor" WITNESSED_DEMO_LEVEL=12
+		var env_enemies := OS.get_environment("WITNESSED_DEMO_ENEMIES")
+		var env_backdrop := OS.get_environment("WITNESSED_DEMO_BACKDROP")
+		var ids: Array = env_enemies.split(",", false) if env_enemies != "" else ["slime", "slime"]
+		var first: Dictionary = GameData.ENEMIES.get(ids[0], {})
+		pb = {"enemies": ids, "backdrop": env_backdrop if env_backdrop != "" else "meadow", "boss_flag": "", "boss": bool(first.get("boss", false)), "region": "meadow"}
 	if GameState.roster.is_empty():
-		var h := Hero.create("player", "Aeryn", "female", "knight", 1)
-		GameState.new_game(h)
+		var env_party := OS.get_environment("WITNESSED_DEMO_PARTY")
+		var classes: Array = env_party.split(",", false) if env_party != "" else ["knight"]
+		var lvl := maxi(1, int(OS.get_environment("WITNESSED_DEMO_LEVEL")))
+		var genders := ["female", "male", "female", "male"]
+		var names := ["Aerin", "Kaelen", "Lyra", "Amos"]
+		var hairs := ["long", "swept", "ponytail", "short"]
+		var skins := ["fair", "olive", "tan", "deep"]
+		var lead := Hero.create("player", names[0], genders[0], classes[0], lvl)
+		lead.hair = hairs[0]
+		GameState.new_game(lead)
+		for i in range(1, mini(4, classes.size())):
+			var h := Hero.create("demo_%d" % i, names[i], genders[i], classes[i], lvl)
+			h.hair = hairs[i]
+			h.skin = skins[i]
+			GameState.roster.append(h)
+			GameState.party.append(h.id)
 	boss_flag = str(pb.get("boss_flag", ""))
 	is_boss = bool(pb.get("boss", false))
 	region = str(pb.get("region", "meadow"))
@@ -133,7 +153,7 @@ func _spawn_heroes() -> void:
 		field.add_child(doll)
 		c.node = doll
 		c.home = doll.position
-		c.tick = 100.0 / c.eff_speed() * randf_range(0.55, 0.95)
+		c.tick = 100.0 / c.eff_speed() * randf_range(0.35, 0.75)
 		if not c.is_alive():
 			doll.play("ko")
 		heroes.append(c)
@@ -163,7 +183,7 @@ func _spawn_enemies(ids: Array) -> void:
 		field.add_child(s)
 		c.node = s
 		c.home = s.position
-		c.tick = 100.0 / c.eff_speed() * randf_range(0.7, 1.1)
+		c.tick = 100.0 / c.eff_speed() * randf_range(0.8, 1.2)
 		enemies.append(c)
 
 
@@ -192,8 +212,8 @@ func _build_ui() -> void:
 	ui.add_child(log_label)
 
 	var panel := PanelContainer.new()
-	panel.position = Vector2(0, 268)
-	panel.size = Vector2(640, 92)
+	panel.position = Vector2(0, 262)
+	panel.size = Vector2(640, 98)
 	ui.add_child(panel)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
@@ -207,23 +227,25 @@ func _build_ui() -> void:
 		_build_party_row(c)
 
 	command_root = Control.new()
-	command_root.custom_minimum_size = Vector2(250, 84)
+	command_root.custom_minimum_size = Vector2(250, 90)
 	command_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(command_root)
 
-	main_menu = VBoxContainer.new()
+	main_menu = GridContainer.new()
+	main_menu.columns = 2
 	main_menu.position = Vector2(0, 0)
-	main_menu.add_theme_constant_override("separation", 1)
+	main_menu.add_theme_constant_override("h_separation", 4)
+	main_menu.add_theme_constant_override("v_separation", 2)
 	main_menu.visible = false
 	command_root.add_child(main_menu)
 
 	sub_panel = VBoxContainer.new()
 	sub_panel.position = Vector2(0, 0)
-	sub_panel.size = Vector2(250, 84)
+	sub_panel.size = Vector2(250, 90)
 	sub_panel.visible = false
 	command_root.add_child(sub_panel)
 	sub_scroll = ScrollContainer.new()
-	sub_scroll.custom_minimum_size = Vector2(250, 58)
+	sub_scroll.custom_minimum_size = Vector2(250, 56)
 	sub_scroll.follow_focus = true
 	sub_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	sub_panel.add_child(sub_scroll)
@@ -233,13 +255,13 @@ func _build_ui() -> void:
 	sub_scroll.add_child(sub_list)
 	desc_label = Label.new()
 	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_label.custom_minimum_size = Vector2(250, 24)
+	desc_label.custom_minimum_size = Vector2(250, 30)
 	desc_label.add_theme_font_size_override("font_size", 13)
 	desc_label.add_theme_color_override("font_color", Color(0.85, 0.8, 0.95))
 	sub_panel.add_child(desc_label)
 
 	hint_label = Label.new()
-	hint_label.position = Vector2(0, 252)
+	hint_label.position = Vector2(0, 246)
 	hint_label.size = Vector2(632, 16)
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	hint_label.add_theme_font_size_override("font_size", 13)
@@ -377,7 +399,9 @@ func _refresh_timeline() -> void:
 	var tag := Label.new()
 	tag.text = "NEXT"
 	tag.add_theme_font_size_override("font_size", 12)
-	tag.add_theme_color_override("font_color", Color(0.7, 0.65, 0.85))
+	tag.add_theme_color_override("font_color", Color(0.85, 0.8, 0.95))
+	tag.add_theme_color_override("font_shadow_color", Color(0, 0, 0))
+	tag.add_theme_constant_override("shadow_offset_y", 1)
 	timeline_box.add_child(tag)
 	var order := _timeline_preview(8)
 	for i in order.size():
@@ -695,7 +719,8 @@ func _show_main_menu(c: Combatant) -> void:
 		var b := Button.new()
 		b.text = e[0]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.custom_minimum_size = Vector2(150, 16)
+		b.custom_minimum_size = Vector2(120, 16)
+		_compact(b)
 		if e[1] == "flee" and is_boss:
 			b.disabled = true
 		b.pressed.connect(_on_menu.bind(e[1], c))
@@ -703,6 +728,15 @@ func _show_main_menu(c: Combatant) -> void:
 		if first == null:
 			first = b
 	call_deferred("_focus", first)
+
+
+func _compact(b: Button) -> void:
+	for st in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var sb := b.get_theme_stylebox(st).duplicate()
+		sb.content_margin_top = 1
+		sb.content_margin_bottom = 1
+		b.add_theme_stylebox_override(st, sb)
+	b.add_theme_font_size_override("font_size", 14)
 
 
 func _focus(ctrl: Control) -> void:
@@ -750,6 +784,7 @@ func _show_skills(c: Combatant) -> void:
 		b.text = "%-16s AP%d MP%d" % [sk["name"], int(sk.get("ap", 0)), int(sk.get("mp", 0))]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(236, 15)
+		_compact(b)
 		b.disabled = c.ap < int(sk.get("ap", 0)) or c.mp < int(sk.get("mp", 0))
 		b.focus_entered.connect(func(): desc_label.text = _skill_desc(sk))
 		b.mouse_entered.connect(func(): desc_label.text = _skill_desc(sk))
@@ -802,6 +837,7 @@ func _show_items(c: Combatant) -> void:
 		b.text = "%-16s x%d" % [it["name"], n]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(236, 15)
+		_compact(b)
 		b.icon = Assets.icon(it["icon"])
 		b.focus_entered.connect(func(): desc_label.text = str(it["desc"]))
 		b.mouse_entered.connect(func(): desc_label.text = str(it["desc"]))
@@ -1079,7 +1115,7 @@ func _perform(user: Combatant, sk: Dictionary, targets: Array, sid: String = "")
 		var hit_t := pre + _hero_hit_time(anim, speed)
 		var grade := ""
 		if user.is_hero and offensive:
-			_qte_begin("attack", _center(user) + Vector2(0, -6), hit_t, Color("ffe27a"))
+			_qte_begin("attack", user.node.position + Vector2(0, -40), hit_t, Color("ffe27a"))
 		if pre > 0.0:
 			if user.is_hero and kind in ["spell", "heal", "buff", "debuff"]:
 				_spawn_fx("buff", _center(user), 12.0, 0.6)
@@ -1227,7 +1263,7 @@ func _calc_damage(user: Combatant, target: Combatant, sk: Dictionary, grade: Str
 	if user.is_hero:
 		base = power * a * (1.1 if is_spell else 1.0) * 100.0 / (100.0 + d * 4.0)
 	else:
-		base = power * a * 1.6 * 100.0 / (100.0 + d * 3.0) * GameState.difficulty_mult()
+		base = power * a * 1.25 * 100.0 / (100.0 + d * 4.0) * GameState.difficulty_mult()
 	var mult := 1.0
 	var weak := element in target.weak
 	var resist := element in target.resist

@@ -262,10 +262,50 @@ def _sky(d, w, h, top, bottom, steps=12):
         d.rectangle([0, y0, w, y1], fill=mix(top, bottom, i / (steps - 1)))
 
 
+# Horizon (ground line) of each backdrop in the 320x180 drawing space, and the
+# horizon every battle backdrop is remapped to so the party stands on the ground.
+BACKDROP_HORIZON = {"meadow": 120, "forest": 150, "cave": 148, "ruins": 120, "wastes": 120, "lair": 148, "tower": 148}
+TARGET_HORIZON = 70
+
+
+class _RemapDraw:
+    """ImageDraw proxy that piecewise-linearly remaps y so the horizon lands at TARGET_HORIZON."""
+
+    def __init__(self, draw: ImageDraw.ImageDraw, horizon: float, height: float):
+        self._d = draw
+        self._g = horizon
+        self._h = height
+
+    def _y(self, y: float) -> float:
+        if y <= self._g:
+            return y * TARGET_HORIZON / self._g
+        return TARGET_HORIZON + (y - self._g) * (self._h - TARGET_HORIZON) / (self._h - self._g)
+
+    def _xy(self, xy):
+        if len(xy) and isinstance(xy[0], (tuple, list)):
+            return [(p[0], self._y(p[1])) for p in xy]
+        return [xy[i] if i % 2 == 0 else self._y(xy[i]) for i in range(len(xy))]
+
+    def polygon(self, xy, **kw):
+        self._d.polygon(self._xy(xy), **kw)
+
+    def ellipse(self, xy, **kw):
+        self._d.ellipse(self._xy(xy), **kw)
+
+    def rectangle(self, xy, **kw):
+        self._d.rectangle(self._xy(xy), **kw)
+
+    def line(self, xy, **kw):
+        self._d.line(self._xy(xy), **kw)
+
+    def point(self, xy, **kw):
+        self._d.point(self._xy(xy), **kw)
+
+
 def render_backdrop(kind: str) -> Image.Image:
     W, H = 320, 180
     img = Image.new("RGBA", (W, H), (0, 0, 0, 255))
-    d = ImageDraw.Draw(img)
+    d = _RemapDraw(ImageDraw.Draw(img), BACKDROP_HORIZON.get(kind, 120), H)
     rnd = random.Random(hash(kind) % 1000)
     if kind == "meadow":
         _sky(d, W, 110, (120, 180, 240), (200, 225, 250))

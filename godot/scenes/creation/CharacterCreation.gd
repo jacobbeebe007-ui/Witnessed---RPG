@@ -58,19 +58,19 @@ func _ready() -> void:
 	var floor_rect := ColorRect.new()
 	floor_rect.color = Color(0.12, 0.09, 0.2)
 	floor_rect.position = Vector2(0, 0)
-	floor_rect.size = Vector2(180, 200)
+	floor_rect.size = Vector2(180, 196)
 	stage.add_child(floor_rect)
 	_doll = PaperDoll.new()
 	_doll.position = Vector2(84, 186)
 	_doll.scale = Vector2(2.4, 2.4)
 	stage.add_child(_doll)
 	_anim_label = Label.new()
-	_anim_label.position = Vector2(4, 204)
+	_anim_label.position = Vector2(4, 197)
 	_anim_label.add_theme_color_override("font_color", Color(0.7, 0.66, 0.8))
 	stage.add_child(_anim_label)
 	var anim_btn := Button.new()
 	anim_btn.text = "Cycle animation"
-	anim_btn.position = Vector2(4, 216)
+	anim_btn.position = Vector2(4, 213)
 	anim_btn.pressed.connect(func():
 		_anim_i = (_anim_i + 1) % ANIM_CYCLE.size()
 		Sfx.play("select")
@@ -140,11 +140,12 @@ func _ready() -> void:
 	opts.add_child(row_col)
 	var cl2 := Label.new()
 	cl2.text = "Hair colour"
-	cl2.custom_minimum_size.x = 76
+	cl2.custom_minimum_size.x = 60
+	row_col.add_theme_constant_override("separation", 1)
 	row_col.add_child(cl2)
 	for i in HAIR_COLORS.size():
 		var cb := Button.new()
-		cb.custom_minimum_size = Vector2(11, 14)
+		cb.custom_minimum_size = Vector2(12, 14)
 		cb.add_theme_stylebox_override("normal", _swatch(HAIR_COLORS[i]))
 		cb.add_theme_stylebox_override("hover", _swatch(HAIR_COLORS[i].lightened(0.3)))
 		cb.add_theme_stylebox_override("pressed", _swatch(HAIR_COLORS[i]))
@@ -166,8 +167,8 @@ func _ready() -> void:
 
 	# --- info column --------------------------------------------------------
 	var info := PanelContainer.new()
-	info.position = Vector2(424, 32)
-	info.custom_minimum_size = Vector2(200, 316)
+	info.position = Vector2(428, 32)
+	info.custom_minimum_size = Vector2(196, 316)
 	add_child(info)
 	var iv := VBoxContainer.new()
 	info.add_child(iv)

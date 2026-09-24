@@ -233,9 +233,8 @@ func _build_hud() -> void:
 	panel.add_child(party_box)
 
 	var right := PanelContainer.new()
-	right.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	right.position = Vector2(640 - 166, 6)
-	right.custom_minimum_size = Vector2(160, 0)
+	right.position = Vector2(640 - 204, 6)
+	right.custom_minimum_size = Vector2(198, 0)
 	hud.add_child(right)
 	var rv := VBoxContainer.new()
 	right.add_child(rv)
@@ -246,12 +245,12 @@ func _build_hud() -> void:
 	rv.add_child(gold_label)
 	var hint := Label.new()
 	hint.text = "WASD move  E talk  Tab menu"
+	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(0.6, 0.55, 0.75))
 	rv.add_child(hint)
 
 	prompt = Label.new()
-	prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	prompt.position = Vector2(0, 300)
+	prompt.position = Vector2(0, 232)
 	prompt.size = Vector2(640, 20)
 	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prompt.add_theme_color_override("font_color", Color("ffe27a"))
@@ -489,6 +488,7 @@ func show_toast(text: String) -> void:
 # interaction
 # ---------------------------------------------------------------------------
 func _update_prompt() -> void:
+	prompt.visible = not (_locked or _menu_open or (dialogue != null and dialogue.active))
 	_near_poi = {}
 	var best := 26.0
 	for p in world.pois:

@@ -34,8 +34,8 @@ func _ready() -> void:
 	title.add_theme_constant_override("shadow_offset_x", 2)
 	title.add_theme_constant_override("shadow_offset_y", 2)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.set_anchors_and_offsets_preset(PRESET_TOP_WIDE)
-	title.offset_top = 40
+	title.position = Vector2(0, 40)
+	title.size = Vector2(640, 32)
 	add_child(title)
 
 	var lines := VBoxContainer.new()
