@@ -181,14 +181,16 @@ func _ready() -> void:
 	_stats_label = RichTextLabel.new()
 	_stats_label.bbcode_enabled = true
 	_stats_label.fit_content = true
-	_stats_label.custom_minimum_size = Vector2(184, 90)
+	_stats_label.custom_minimum_size = Vector2(184, 70)
 	_stats_label.scroll_active = false
+	_stats_label.add_theme_font_size_override("normal_font_size", 14)
 	iv.add_child(_stats_label)
 	_skills_label = RichTextLabel.new()
 	_skills_label.bbcode_enabled = true
 	_skills_label.fit_content = true
-	_skills_label.custom_minimum_size = Vector2(184, 120)
+	_skills_label.custom_minimum_size = Vector2(184, 100)
 	_skills_label.scroll_active = false
+	_skills_label.add_theme_font_size_override("normal_font_size", 12)
 	iv.add_child(_skills_label)
 
 	hair_i = maxi(0, _hairs().find("short"))
@@ -249,13 +251,13 @@ func _refresh() -> void:
 	var c: Dictionary = GameData.CLASSES[class_id]
 	_class_desc.text = "[color=#ffe27a]%s[/color] - [i]%s[/i]\n%s" % [GameData.class_name_for(class_id, gender), c["role"], c["desc"]]
 	var h := _preview_hero
-	_stats_label.text = "[color=#b0a0d0]Level 1 stats[/color]\nHP %d   MP %d\nATK %d   MAG %d\nDEF %d   RES %d\nSPD %d   LUCK %d\nWeapons: %s" % [
-		h.max_hp(), h.max_mp(), h.attack(), h.magic(), h.defense(), h.resistance(), h.speed(), h.luck(), ", ".join(c["weapons"])]
+	_stats_label.text = "[color=#b0a0d0]Level 1 stats[/color]\nHP %d  MP %d  SPD %d\nATK %d  MAG %d  LCK %d\nDEF %d  RES %d\nWeapons: %s" % [
+		h.max_hp(), h.max_mp(), h.speed(), h.attack(), h.magic(), h.luck(), h.defense(), h.resistance(), ", ".join(c["weapons"])]
 	var lines := "[color=#b0a0d0]Abilities by level[/color]\n"
 	for entry in c["skills"]:
 		var s: Dictionary = GameData.SKILLS[entry[1]]
 		lines += "[color=#ffe27a]Lv%d[/color] %s\n" % [int(entry[0]), s["name"]]
-	_skills_label.text = lines
+	_skills_label.text = lines.strip_edges()
 
 
 func _play_preview() -> void:
