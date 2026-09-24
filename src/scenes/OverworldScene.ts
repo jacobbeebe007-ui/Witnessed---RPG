@@ -247,23 +247,28 @@ export class OverworldScene extends Phaser.Scene {
   private buildRoamers(): void {
     this.roamers = [];
     const spots: Array<{ tx: number; ty: number; id: string }> = [
-      { tx: 11, ty: 18, id: "slime" },
-      { tx: 14, ty: 13, id: "goblin" },
-      { tx: 19, ty: 17, id: "wolf" },
+      { tx: 6, ty: 17, id: "slime" },
+      { tx: 11, ty: 18, id: "goblin" },
+      { tx: 14, ty: 13, id: "wolf" },
     ];
     for (const s of spots) {
-      const spr = this.add.sprite(s.tx * TILE + 8, s.ty * TILE + 8, enemyKey(s.id, 0)).setScale(1.15).setDepth(8);
+      const spr = this.add.sprite(s.tx * TILE + 8, s.ty * TILE + 8, enemyKey(s.id, 0)).setScale(1.35).setDepth(8);
       spr.play(`enemyidle_${s.id}`);
+      spr.setInteractive({ useHandCursor: true });
       this.tweens.add({
         targets: spr,
-        x: spr.x + Phaser.Math.Between(-24, 24),
-        y: spr.y + Phaser.Math.Between(-16, 16),
+        x: spr.x + Phaser.Math.Between(-18, 18),
+        y: spr.y + Phaser.Math.Between(-12, 12),
         duration: 2200,
         yoyo: true,
         repeat: -1,
         ease: "Sine.inOut",
       });
-      this.roamers.push({ enemyId: s.id, sprite: spr });
+      const roamer: Roamer = { enemyId: s.id, sprite: spr };
+      spr.on("pointerdown", () => {
+        if (!this.transitioning) this.launchBattle([ENEMIES[roamer.enemyId]], false);
+      });
+      this.roamers.push(roamer);
     }
   }
 
@@ -418,12 +423,21 @@ export class OverworldScene extends Phaser.Scene {
       if (!moving && spr.anims.currentAnim?.key !== keys.idle) spr.play(keys.idle);
     });
 
+    for (const r of this.roamers) {
+      if (!r.sprite.active) continue;
+      const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, r.sprite.x, r.sprite.y);
+      if (d < 72) {
+        this.launchBattle([ENEMIES[r.enemyId]], false);
+        return;
+      }
+    }
+
     // encounter accumulation
     if (moving) {
       this.distanceAcc += (speed * delta) / 1000;
       if (this.distanceAcc >= this.nextEncounter) {
         this.distanceAcc = 0;
-        this.nextEncounter = Phaser.Math.Between(160, 280);
+        this.nextEncounter = Phaser.Math.Between(90, 160);
         this.tryEncounter();
         return;
       }
@@ -457,16 +471,6 @@ export class OverworldScene extends Phaser.Scene {
       this.promptText.setAlpha(0);
     }
 
-    for (const r of this.roamers) {
-      if (!r.sprite.active) continue;
-      const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, r.sprite.x, r.sprite.y);
-      if (d < 42) {
-        this.transitioning = true;
-        this.launchBattle([ENEMIES[r.enemyId]], false);
-        return;
-      }
-    }
-
     // boss contact
     for (const b of this.bosses) {
       if (!b.sprite.active) continue;
@@ -482,7 +486,7 @@ export class OverworldScene extends Phaser.Scene {
 
   private tryEncounter(): void {
     const region = this.regionAt(Math.floor(this.player.x / TILE));
-    const chance = region === "meadow" ? 0.55 : region === "forest" ? 0.65 : 0.75;
+    const chance = region === "meadow" ? 0.9 : region === "forest" ? 0.95 : 1;
     if (Math.random() > chance) return;
     const table = ENCOUNTER_TABLES[region];
     const count = Math.random() < 0.4 ? 2 : 1;
