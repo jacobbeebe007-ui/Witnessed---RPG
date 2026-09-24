@@ -28,4 +28,5 @@ export const SCENES = {
   Overworld: "Overworld",
   Battle: "Battle",
   Shop: "Shop",
+  Dialogue: "Dialogue",
 } as const;

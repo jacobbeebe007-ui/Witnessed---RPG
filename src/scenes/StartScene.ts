@@ -32,7 +32,7 @@ export class StartScene extends Phaser.Scene {
     this.tweens.add({ targets: title, y: 122, duration: 2600, yoyo: true, repeat: -1, ease: "Sine.inOut" });
 
     this.add
-      .text(cx, 188, "A  T U R N - B A S E D  R P G", textStyle(18, COLORS.accent2, { fontStyle: "bold" }))
+      .text(cx, 188, "A  T U R N - B A S E D  F A N T A S Y  R P G", textStyle(16, COLORS.accent2, { fontStyle: "bold" }))
       .setOrigin(0.5);
 
     const hasSave = this.hasSave();
@@ -49,7 +49,7 @@ export class StartScene extends Phaser.Scene {
     new Button(this, cx, y, "Settings", () => this.scene.start(SCENES.Settings, { from: SCENES.Start }), { width: 260 });
 
     this.add
-      .text(cx, GAME_HEIGHT - 24, "Made with Phaser 3  •  d20-driven combat  •  v0.1", textStyle(13, COLORS.textDim))
+      .text(cx, GAME_HEIGHT - 24, "Party of 4  •  timed strikes & parries  •  v0.2", textStyle(13, COLORS.textDim))
       .setOrigin(0.5);
   }
 
@@ -69,7 +69,7 @@ export class StartScene extends Phaser.Scene {
   }
 
   private continueGame(): void {
-    if (GameState.load() && GameState.player) {
+    if (GameState.load() && GameState.party.length) {
       this.scene.start(SCENES.Overworld);
     } else {
       this.startNew();

@@ -49,6 +49,7 @@ async function startGame(): Promise<void> {
   const { OverworldScene } = await import("./scenes/OverworldScene");
   const { BattleScene } = await import("./scenes/BattleScene");
   const { ShopScene } = await import("./scenes/ShopScene");
+  const { DialogueScene } = await import("./scenes/DialogueScene");
 
   // Prefer Canvas: this is a 2D pixel-art game, and WebGL software fallbacks
   // are increasingly flaky in VMs / locked-down browsers (can hang before first paint).
@@ -73,7 +74,7 @@ async function startGame(): Promise<void> {
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     render: { antialias: false },
-    scene: [BootScene, StartScene, SettingsScene, CharacterCreationScene, OverworldScene, BattleScene, ShopScene],
+    scene: [BootScene, StartScene, SettingsScene, CharacterCreationScene, OverworldScene, BattleScene, ShopScene, DialogueScene],
     callbacks: {
       postBoot: (game) => {
         // BootScene may still be generating textures; StartScene clears the overlay.

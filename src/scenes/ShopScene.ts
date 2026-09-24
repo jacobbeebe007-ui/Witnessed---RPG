@@ -4,8 +4,9 @@ import { GameState } from "../systems/GameState";
 import { Button, drawPanel, textStyle } from "../ui/ui";
 import { addAmbientBackground } from "../ui/background";
 import { SHOP_STOCK, getItem, WEAPONS, ARMORS, type Item } from "../data/items";
-import { maxHP, maxMP, weapon, armor } from "../systems/character";
+import { maxHP, maxMP, weapon, armor, type Character } from "../systems/character";
 import { CLASSES } from "../data/classes";
+import { actorKeys } from "../gfx/characters";
 
 export class ShopScene extends Phaser.Scene {
   private buyContainer!: Phaser.GameObjects.Container;
@@ -13,6 +14,8 @@ export class ShopScene extends Phaser.Scene {
   private goldText!: Phaser.GameObjects.Text;
   private statText!: Phaser.GameObjects.Text;
   private feedback!: Phaser.GameObjects.Text;
+  private memberIdx = 0;
+  private preview?: Phaser.GameObjects.Sprite;
 
   constructor() {
     super(SCENES.Shop);
@@ -24,18 +27,19 @@ export class ShopScene extends Phaser.Scene {
       return;
     }
     addAmbientBackground(this, COLORS.accent2);
-    const p = GameState.player;
-    this.add.text(GAME_WIDTH / 2, 30, "Town Marketplace", textStyle(30, COLORS.text, { fontStyle: "bold" })).setOrigin(0.5);
-    this.goldText = this.add.text(GAME_WIDTH / 2, 58, "", textStyle(16, COLORS.accent2)).setOrigin(0.5);
+    this.memberIdx = 0;
+    this.add.text(GAME_WIDTH / 2, 24, "Town Marketplace", textStyle(28, COLORS.text, { fontStyle: "bold" })).setOrigin(0.5);
+    this.goldText = this.add.text(GAME_WIDTH / 2, 50, "", textStyle(15, COLORS.accent2)).setOrigin(0.5);
+    this.buildMemberTabs();
 
     // Buy panel
-    drawPanel(this, 20, 82, 440, 400);
-    this.add.text(40, 92, "WARES  (buy)", textStyle(15, COLORS.accent2, { fontStyle: "bold" }));
+    drawPanel(this, 20, 96, 440, 386);
+    this.add.text(40, 104, "WARES  (buy)", textStyle(15, COLORS.accent2, { fontStyle: "bold" }));
     this.buyContainer = this.add.container(0, 0);
 
     // Inventory panel
-    drawPanel(this, 480, 82, 460, 330);
-    this.add.text(500, 92, "YOUR GOODS  (equip / sell)", textStyle(15, COLORS.accent2, { fontStyle: "bold" }));
+    drawPanel(this, 480, 96, 460, 316);
+    this.add.text(500, 104, "YOUR GOODS  (equip / sell)", textStyle(15, COLORS.accent2, { fontStyle: "bold" }));
     this.invContainer = this.add.container(0, 0);
 
     // Player summary + rest
@@ -47,8 +51,21 @@ export class ShopScene extends Phaser.Scene {
     new Button(this, 130, GAME_HEIGHT - 22, "Rest (Free Heal)", () => this.rest(), { width: 210, height: 36, fill: COLORS.panelLight });
     new Button(this, GAME_WIDTH - 130, GAME_HEIGHT - 22, "Leave Town", () => this.leave(), { width: 210, height: 36, fill: COLORS.border });
 
-    void p;
     this.refresh();
+  }
+
+  private selected(): Character {
+    return GameState.party[this.memberIdx] ?? GameState.player!;
+  }
+
+  private buildMemberTabs(): void {
+    GameState.party.forEach((c, i) => {
+      const bx = 80 + i * 200;
+      new Button(this, bx, 78, c.name, () => {
+        this.memberIdx = i;
+        this.refresh();
+      }, { width: 180, height: 28, size: 13, fill: i === this.memberIdx ? COLORS.border : COLORS.panelLight });
+    });
   }
 
   private priceWithCharisma(base: number, buying: boolean): number {
@@ -65,18 +82,20 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private refresh(): void {
-    const p = GameState.player!;
-    this.goldText.setText(`Gold: ${p.gold}`);
+    const hero = GameState.player!;
+    const p = this.selected();
+    this.goldText.setText(`Party gold: ${hero.gold}`);
     this.statText.setText(
-      `${p.name}  Lv ${p.level} ${CLASSES[p.classId].name(p.gender)}    HP ${p.hp}/${maxHP(p)}  MP ${p.mp}/${maxMP(p)}\n` +
-        `Equipped:  ${weapon(p).name} (${weapon(p).dice})   •   ${armor(p).name} (AC+${armor(p).ac})`
+      `Equip for ${p.name}  Lv ${p.level} ${CLASSES[p.classId].name(p.gender)}    HP ${p.hp}/${maxHP(p)}  MP ${p.mp}/${maxMP(p)}\n` +
+        `Worn:  ${weapon(p).name} (${weapon(p).dice})   •   ${armor(p).name} (AC+${armor(p).ac})  — armor cut changes with gender`
     );
+    this.updatePreview(p);
 
     // Buy list
     this.buyContainer.removeAll(true);
     SHOP_STOCK.forEach((id, i) => {
       const it = getItem(id)!;
-      const y = 120 + i * 31;
+      const y = 132 + i * 30;
       const price = this.priceWithCharisma(it.price, true);
       this.buyContainer.add(this.add.text(40, y, it.name, textStyle(14, COLORS.text)));
       this.buyContainer.add(this.add.text(210, y, this.itemSub(it), textStyle(11, COLORS.textDim)).setOrigin(0, 0));
@@ -85,8 +104,8 @@ export class ShopScene extends Phaser.Scene {
         width: 60,
         height: 24,
         size: 13,
-        fill: p.gold >= price ? COLORS.panelLight : COLORS.panel,
-        disabled: p.gold < price,
+        fill: hero.gold >= price ? COLORS.panelLight : COLORS.panel,
+        disabled: hero.gold < price,
       });
       this.buyContainer.add(btn);
     });
@@ -94,13 +113,13 @@ export class ShopScene extends Phaser.Scene {
     // Inventory list (owned gear + consumables), grouped with counts
     this.invContainer.removeAll(true);
     const counts = new Map<string, number>();
-    for (const id of p.inventory) counts.set(id, (counts.get(id) ?? 0) + 1);
+    for (const id of GameState.bag()) counts.set(id, (counts.get(id) ?? 0) + 1);
     let row = 0;
     // Equipped items first (can't sell equipped, but show)
     for (const [id, count] of counts) {
       const it = getItem(id);
       if (!it) continue;
-      const y = 120 + row * 31;
+      const y = 132 + row * 30;
       const sell = this.priceWithCharisma(it.price, false);
       this.invContainer.add(this.add.text(500, y, `${it.name}${count > 1 ? " x" + count : ""}`, textStyle(14, COLORS.text)));
       this.invContainer.add(this.add.text(660, y, this.itemSub(it), textStyle(11, COLORS.textDim)));
@@ -124,63 +143,74 @@ export class ShopScene extends Phaser.Scene {
     this.tweens.add({ targets: this.feedback, alpha: 0.2, duration: 1400, yoyo: false });
   }
 
+  private updatePreview(p: Character): void {
+    const keys = actorKeys(this, p);
+    if (!this.preview) {
+      this.preview = this.add.sprite(900, 412, `vis_${keys.vid}_idle_0`).setScale(1.7).setOrigin(0.5, 1).setDepth(20);
+    }
+    this.preview.play(keys.idle);
+  }
+
   private buy(id: string): void {
-    const p = GameState.player!;
+    const hero = GameState.player!;
     const it = getItem(id)!;
     const price = this.priceWithCharisma(it.price, true);
-    if (p.gold < price) {
+    if (hero.gold < price) {
       this.flash("Not enough gold!", false);
       return;
     }
-    p.gold -= price;
-    p.inventory.push(id);
+    hero.gold -= price;
+    GameState.bag().push(id);
     GameState.save();
     this.flash(`Bought ${it.name}.`);
     this.refresh();
   }
 
   private sell(id: string): void {
-    const p = GameState.player!;
+    const hero = GameState.player!;
     const it = getItem(id)!;
-    const idx = p.inventory.indexOf(id);
+    const bag = GameState.bag();
+    const idx = bag.indexOf(id);
     if (idx < 0) return;
-    p.inventory.splice(idx, 1);
+    bag.splice(idx, 1);
     const price = this.priceWithCharisma(it.price, false);
-    p.gold += price;
+    hero.gold += price;
     GameState.save();
     this.flash(`Sold ${it.name} for ${price}g.`);
     this.refresh();
   }
 
   private equip(id: string): void {
-    const p = GameState.player!;
+    const p = this.selected();
+    const bag = GameState.bag();
     const it = getItem(id);
     if (!it) return;
-    const idx = p.inventory.indexOf(id);
+    const idx = bag.indexOf(id);
     if (idx < 0) return;
     if (it.kind === "weapon") {
       const prev = p.weaponId;
       p.weaponId = id;
-      p.inventory.splice(idx, 1);
-      if (WEAPONS[prev]) p.inventory.push(prev);
-      this.flash(`Equipped ${it.name}.`);
+      bag.splice(idx, 1);
+      if (WEAPONS[prev]) bag.push(prev);
+      this.flash(`${p.name} wields ${it.name}.`);
     } else if (it.kind === "armor") {
       const prev = p.armorId;
       p.armorId = id;
-      p.inventory.splice(idx, 1);
-      if (ARMORS[prev]) p.inventory.push(prev);
-      this.flash(`Equipped ${it.name}.`);
+      bag.splice(idx, 1);
+      if (ARMORS[prev]) bag.push(prev);
+      this.flash(`${p.name} dons ${it.name}.`);
     }
     GameState.save();
     this.refresh();
   }
 
   private rest(): void {
-    const p = GameState.player!;
-    p.hp = maxHP(p);
-    p.mp = maxMP(p);
+    for (const c of GameState.party) {
+      c.hp = maxHP(c);
+      c.mp = maxMP(c);
+    }
     GameState.save();
-    this.flash("You rest and recover fully.");
+    this.flash("The whole party rests and recovers.");
     this.refresh();
   }
 

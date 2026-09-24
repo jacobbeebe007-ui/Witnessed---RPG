@@ -1,7 +1,9 @@
 import type { Attributes, AttrKey } from "../data/attributes";
 import { abilityMod } from "../data/dice";
 import { CLASSES, type ClassId, type Gender } from "../data/classes";
-import { ARMORS, WEAPONS, type ArmorItem, type WeaponItem } from "../data/items";
+import { ARMORS, WEAPONS, type ArmorItem, type WeaponItem, type ArmorStyle, type WeaponStyle } from "../data/items";
+import { CLASS_PROGRESSION, SKILLS } from "../data/skills";
+import { COMPANIONS } from "../data/companions";
 
 export interface Character {
   name: string;
@@ -16,7 +18,10 @@ export interface Character {
   weaponId: string;
   armorId: string;
   skills: string[];
-  inventory: string[]; // consumable + owned item ids
+  inventory: string[];
+  companionId?: string;
+  hairColor?: number;
+  skinTone?: number;
 }
 
 export function xpForNextLevel(level: number): number {
@@ -40,6 +45,14 @@ export function weapon(c: Character): WeaponItem {
 
 export function armor(c: Character): ArmorItem {
   return ARMORS[c.armorId] ?? ARMORS.cloth_robe;
+}
+
+export function weaponStyle(c: Character): WeaponStyle {
+  return weapon(c).style;
+}
+
+export function armorStyle(c: Character): ArmorStyle {
+  return armor(c).style;
 }
 
 /** Armor Class the enemy must beat with its d20 attack. */
@@ -84,9 +97,44 @@ export function createCharacter(gender: Gender, classId: ClassId, attrs: Attribu
     skills: [...def.startingSkills],
     inventory: ["potion", "potion"],
   };
+  if (gender === "female" && classId === "mage" && !c.skills.includes("siren_wail")) {
+    // Sirens begin with their signature cry already humming.
+    c.skills.push("siren_wail");
+  }
+  syncSkills(c);
   c.hp = maxHP(c);
   c.mp = maxMP(c);
   return c;
+}
+
+export function makeCompanion(id: string): Character {
+  const def = COMPANIONS[id];
+  const c = createCharacter(def.gender, def.classId, { ...def.attrs }, def.name);
+  c.companionId = id;
+  c.hairColor = def.hairColor;
+  c.skinTone = def.skinTone;
+  c.gold = 0;
+  c.inventory = [];
+  c.hp = maxHP(c);
+  c.mp = maxMP(c);
+  return c;
+}
+
+/** Unlock every skill the character has earned for their current level. Returns newly granted ids. */
+export function syncSkills(c: Character): string[] {
+  const unlocked: string[] = [];
+  const steps = CLASS_PROGRESSION[c.classId] ?? [];
+  for (const step of steps) {
+    if (c.level >= step.level && !c.skills.includes(step.skill) && SKILLS[step.skill]) {
+      c.skills.push(step.skill);
+      unlocked.push(step.skill);
+    }
+  }
+  if (c.gender === "female" && c.classId === "mage" && c.level >= 1 && !c.skills.includes("siren_wail")) {
+    c.skills.push("siren_wail");
+    unlocked.push("siren_wail");
+  }
+  return unlocked;
 }
 
 export interface LevelUpResult {
@@ -94,6 +142,7 @@ export interface LevelUpResult {
   newLevel: number;
   hpGain: number;
   mpGain: number;
+  newSkills: string[];
 }
 
 export function grantXP(c: Character, amount: number): LevelUpResult {
@@ -101,6 +150,7 @@ export function grantXP(c: Character, amount: number): LevelUpResult {
   let leveled = false;
   let hpGain = 0;
   let mpGain = 0;
+  const newSkills: string[] = [];
   while (c.xp >= xpForNextLevel(c.level)) {
     c.xp -= xpForNextLevel(c.level);
     const beforeHP = maxHP(c);
@@ -109,10 +159,27 @@ export function grantXP(c: Character, amount: number): LevelUpResult {
     hpGain += maxHP(c) - beforeHP;
     mpGain += maxMP(c) - beforeMP;
     leveled = true;
+    newSkills.push(...syncSkills(c));
   }
   if (leveled) {
     c.hp = maxHP(c);
     c.mp = maxMP(c);
   }
-  return { leveled, newLevel: c.level, hpGain, mpGain };
+  return { leveled, newLevel: c.level, hpGain, mpGain, newSkills };
+}
+
+export function defaultHair(classId: ClassId, gender: Gender): number {
+  const byClass: Record<ClassId, number> = {
+    mage: gender === "female" ? 0xc9a0ff : 0x5a3a8a,
+    rogue: gender === "female" ? 0x1a1220 : 0x2e2a3a,
+    ranger: gender === "female" ? 0x8a4a20 : 0x6b4a2a,
+    knight: gender === "female" ? 0xf0d080 : 0xcaa64a,
+    brute: gender === "female" ? 0xa03020 : 0x7a2a1a,
+    inquisitor: gender === "female" ? 0xf4ecd8 : 0xe8e0d0,
+  };
+  return byClass[classId];
+}
+
+export function defaultSkin(gender: Gender): number {
+  return gender === "female" ? 0xf3c6a8 : 0xe0a878;
 }
