@@ -206,7 +206,8 @@ func _tab_party() -> void:
 	_label("%s the %s" % [h.display_name, h.class_title()], Color("ffe27a"), 20)
 	_label(GameData.CLASSES[h.class_id]["role"], Color(0.7, 0.65, 0.85), 13)
 	_label("HP %d/%d    MP %d/%d" % [h.hp, h.max_hp(), h.mp, h.max_mp()])
-	_label("ATK %d   MAG %d   DEF %d   RES %d   SPD %d   LCK %d" % [h.attack(), h.magic(), h.defense(), h.resistance(), h.speed(), h.luck()])
+	_label("ATK %d   MAG %d   DEF %d" % [h.attack(), h.magic(), h.defense()])
+	_label("RES %d   SPD %d   LCK %d" % [h.resistance(), h.speed(), h.luck()])
 	_label("XP %d   (next level in %d)" % [h.xp, h.xp_to_next()] if h.level < GameData.MAX_LEVEL else "XP %d   (max level)" % h.xp)
 	var in_party := h.id in GameState.party
 	var b := Button.new()
