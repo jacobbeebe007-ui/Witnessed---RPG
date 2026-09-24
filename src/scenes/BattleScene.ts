@@ -103,12 +103,15 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private buildBackground(): void {
-    const region = this.isBoss ? 0x2a1230 : 0x142014;
+    const top = this.isBoss ? 0x3a1848 : 0x1c3a28;
+    const bot = this.isBoss ? 0x140818 : 0x0c1810;
     const g = this.add.graphics();
-    g.fillGradientStyle(region, region, 0x05030a, 0x05030a, 1);
+    g.fillGradientStyle(top, top, bot, bot, 1);
     g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-    g.fillStyle(0x0a0710, 0.6);
-    g.fillEllipse(GAME_WIDTH / 2, 300, GAME_WIDTH * 1.2, 260);
+    g.fillStyle(0x2a4a30, 0.45);
+    g.fillEllipse(GAME_WIDTH / 2, 310, GAME_WIDTH * 1.1, 220);
+    g.fillStyle(0x1a3020, 0.5);
+    g.fillEllipse(GAME_WIDTH / 2, 318, GAME_WIDTH * 0.7, 90);
     if (this.isBoss) {
       const flash = this.add.text(GAME_WIDTH / 2, 36, "BOSS BATTLE", textStyle(22, COLORS.danger, { fontStyle: "bold" })).setOrigin(0.5);
       this.tweens.add({ targets: flash, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
@@ -458,9 +461,9 @@ export class BattleScene extends Phaser.Scene {
 
   private openMeter(onGrade: (g: TimingGrade) => void): void {
     this.clearMeter();
-    const x = 300;
-    const y = 360;
-    const w = 360;
+    const x = 220;
+    const y = 250;
+    const w = 520;
     const sweet0 = 0.62;
     const sweet1 = 0.78;
     const g = this.add.graphics().setDepth(80);
@@ -478,7 +481,7 @@ export class BattleScene extends Phaser.Scene {
     this.meterLabel = this.add.text(x + w / 2, y - 28, "STRIKE", textStyle(14, COLORS.accent2, { fontStyle: "bold" })).setOrigin(0.5).setDepth(81);
 
     let resolved = false;
-    const duration = 820;
+    const duration = 1300;
     const tween = this.tweens.add({
       targets: marker,
       x: x + w,
@@ -498,8 +501,12 @@ export class BattleScene extends Phaser.Scene {
     };
 
     const handler = () => finish();
-    this.input.keyboard?.once("keydown-SPACE", handler);
-    this.input.once("pointerdown", handler);
+    // Ignore the click that opened Attack so the bar cannot auto-resolve.
+    this.time.delayedCall(180, () => {
+      if (resolved) return;
+      this.input.keyboard?.once("keydown-SPACE", handler);
+      this.input.once("pointerdown", handler);
+    });
   }
 
   private clearMeter(): void {
