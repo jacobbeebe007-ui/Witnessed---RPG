@@ -33,6 +33,11 @@ interface CompanionNpc {
   sprite: Phaser.GameObjects.Sprite;
 }
 
+interface Roamer {
+  enemyId: string;
+  sprite: Phaser.GameObjects.Sprite;
+}
+
 export class OverworldScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private followers: Phaser.GameObjects.Sprite[] = [];
@@ -45,8 +50,9 @@ export class OverworldScene extends Phaser.Scene {
   private towns: Town[] = [];
   private bosses: BossMarker[] = [];
   private npcs: CompanionNpc[] = [];
+  private roamers: Roamer[] = [];
   private distanceAcc = 0;
-  private nextEncounter = 180;
+  private nextEncounter = 140;
   private nearTown: Town | null = null;
   private nearNpc: CompanionNpc | null = null;
   private transitioning = false;
@@ -68,12 +74,13 @@ export class OverworldScene extends Phaser.Scene {
     }
     this.transitioning = false;
     this.distanceAcc = 0;
-    this.nextEncounter = Phaser.Math.Between(320, 560);
+    this.nextEncounter = Phaser.Math.Between(120, 220);
 
     this.buildMap();
     this.buildPlayer();
     this.buildFollowers();
     this.buildNpcs();
+    this.buildRoamers();
     this.buildBosses();
     this.buildHud();
     this.setupInput();
@@ -196,7 +203,7 @@ export class OverworldScene extends Phaser.Scene {
     this.heroKeys = actorKeys(this, p);
     let sx = GameState.overworld.hasSpawn ? GameState.overworld.x : 3 * TILE;
     let sy = GameState.overworld.hasSpawn ? GameState.overworld.y : 15 * TILE;
-    this.player = this.physics.add.sprite(sx, sy, `vis_${this.heroKeys.vid}_idle_0`).setScale(1.15);
+    this.player = this.physics.add.sprite(sx, sy, `vis_${this.heroKeys.vid}_idle_0`).setScale(1.55);
     this.player.setSize(16, 12).setOffset(10, 36);
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(10);
@@ -209,7 +216,7 @@ export class OverworldScene extends Phaser.Scene {
     this.followers = [];
     GameState.party.slice(1).forEach((c, i) => {
       const keys = actorKeys(this, c);
-      const spr = this.add.sprite(this.player.x - 12 - i * 14, this.player.y, `vis_${keys.vid}_idle_0`).setScale(1.05).setDepth(9);
+      const spr = this.add.sprite(this.player.x - 12 - i * 14, this.player.y, `vis_${keys.vid}_idle_0`).setScale(1.4).setDepth(9);
       spr.play(keys.idle);
       spr.setData("keys", keys);
       this.followers.push(spr);
@@ -223,10 +230,40 @@ export class OverworldScene extends Phaser.Scene {
       const def = COMPANIONS[id];
       const guest = makeCompanion(id);
       const keys = actorKeys(this, guest);
-      const spr = this.add.sprite(def.tx * TILE + 16, def.ty * TILE + 8, `vis_${keys.vid}_idle_0`).setScale(1.15).setDepth(9);
+      const spr = this.add.sprite(def.tx * TILE + 16, def.ty * TILE + 8, `vis_${keys.vid}_idle_0`).setScale(1.55).setDepth(9);
       spr.play(keys.idle);
-      this.add.text(spr.x, spr.y - 28, def.name, textStyle(11, COLORS.accent2, { fontStyle: "bold" })).setOrigin(0.5);
-      this.npcs.push({ id, sprite: spr });
+      spr.setInteractive({ useHandCursor: true, pixelPerfect: false });
+      this.add.text(spr.x, spr.y - 34, def.name, textStyle(11, COLORS.accent2, { fontStyle: "bold" })).setOrigin(0.5);
+      const bang = this.add.text(spr.x + 16, spr.y - 48, "!", textStyle(18, COLORS.accent2, { fontStyle: "bold" })).setOrigin(0.5);
+      this.tweens.add({ targets: bang, y: bang.y - 4, duration: 700, yoyo: true, repeat: -1, ease: "Sine.inOut" });
+      const npc: CompanionNpc = { id, sprite: spr };
+      spr.on("pointerdown", () => {
+        if (!this.transitioning) this.talkToNpc(npc);
+      });
+      this.npcs.push(npc);
+    }
+  }
+
+  private buildRoamers(): void {
+    this.roamers = [];
+    const spots: Array<{ tx: number; ty: number; id: string }> = [
+      { tx: 11, ty: 18, id: "slime" },
+      { tx: 14, ty: 13, id: "goblin" },
+      { tx: 19, ty: 17, id: "wolf" },
+    ];
+    for (const s of spots) {
+      const spr = this.add.sprite(s.tx * TILE + 8, s.ty * TILE + 8, enemyKey(s.id, 0)).setScale(1.15).setDepth(8);
+      spr.play(`enemyidle_${s.id}`);
+      this.tweens.add({
+        targets: spr,
+        x: spr.x + Phaser.Math.Between(-24, 24),
+        y: spr.y + Phaser.Math.Between(-16, 16),
+        duration: 2200,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.inOut",
+      });
+      this.roamers.push({ enemyId: s.id, sprite: spr });
     }
   }
 
@@ -386,7 +423,7 @@ export class OverworldScene extends Phaser.Scene {
       this.distanceAcc += (speed * delta) / 1000;
       if (this.distanceAcc >= this.nextEncounter) {
         this.distanceAcc = 0;
-        this.nextEncounter = Phaser.Math.Between(320, 560);
+        this.nextEncounter = Phaser.Math.Between(160, 280);
         this.tryEncounter();
         return;
       }
@@ -404,8 +441,9 @@ export class OverworldScene extends Phaser.Scene {
     }
     this.nearNpc = null;
     for (const n of this.npcs) {
-      const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, n.sprite.x, n.sprite.y);
-      if (d < 38) {
+      const ntx = Math.floor(n.sprite.x / TILE);
+      const nty = Math.floor(n.sprite.y / TILE);
+      if (Math.abs(ntx - ptx) <= 2 && Math.abs(nty - pty) <= 2) {
         this.nearNpc = n;
         break;
       }
@@ -417,6 +455,16 @@ export class OverworldScene extends Phaser.Scene {
       if (this.promptText.alpha < 1) this.promptText.setText("Press  E  to enter Town (shop, rest, equip party)").setAlpha(1);
     } else if (this.promptText.alpha > 0) {
       this.promptText.setAlpha(0);
+    }
+
+    for (const r of this.roamers) {
+      if (!r.sprite.active) continue;
+      const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, r.sprite.x, r.sprite.y);
+      if (d < 42) {
+        this.transitioning = true;
+        this.launchBattle([ENEMIES[r.enemyId]], false);
+        return;
+      }
     }
 
     // boss contact
@@ -434,7 +482,7 @@ export class OverworldScene extends Phaser.Scene {
 
   private tryEncounter(): void {
     const region = this.regionAt(Math.floor(this.player.x / TILE));
-    const chance = region === "meadow" ? 0.35 : region === "forest" ? 0.5 : 0.65;
+    const chance = region === "meadow" ? 0.55 : region === "forest" ? 0.65 : 0.75;
     if (Math.random() > chance) return;
     const table = ENCOUNTER_TABLES[region];
     const count = Math.random() < 0.4 ? 2 : 1;

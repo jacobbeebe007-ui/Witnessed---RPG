@@ -117,7 +117,7 @@ export class CharacterCreationScene extends Phaser.Scene {
     const tmp = this.previewCharacter();
     const keys = actorKeys(this, tmp);
     this.preview = this.add.sprite(cx, 210, `vis_${keys.vid}_idle_0`).setScale(3.6).setOrigin(0.5, 1);
-    this.preview.play(keys.idle);
+    this.preview.play(keys.walk);
 
     this.classNameText = this.add.text(cx, 270, "", textStyle(24, COLORS.accent, { fontStyle: "bold" })).setOrigin(0.5);
     this.roleText = this.add.text(cx, 296, "", textStyle(14, COLORS.textDim)).setOrigin(0.5);
@@ -215,7 +215,7 @@ export class CharacterCreationScene extends Phaser.Scene {
 
   private updatePreviewSprite(): void {
     const keys = actorKeys(this, this.previewCharacter());
-    this.preview.play(keys.idle);
+    this.preview.play(keys.walk);
     (["male", "female"] as Gender[]).forEach((g) => {
       const sel = g === this.gender;
       this.genderTabs[g].setFillStyle(sel ? COLORS.border : COLORS.panelLight).setStrokeStyle(2, sel ? COLORS.accent : COLORS.border);

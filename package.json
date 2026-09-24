@@ -1,7 +1,7 @@
 {
   "name": "witnessed-rpg",
-  "version": "0.1.0",
-  "description": "Witnessed — a turn-based D&D-inspired JRPG built with Phaser 3 + TypeScript",
+  "version": "0.2.0",
+  "description": "Witnessed — a turn-based fantasy JRPG with a party of four, timed combat, and equipment-driven pixel heroes",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",

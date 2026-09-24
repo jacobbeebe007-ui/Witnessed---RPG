@@ -190,16 +190,18 @@ function drawHair(ctx: CanvasRenderingContext2D, gender: Gender, classId: ClassI
   px(ctx, hx + headW - 1, hy, 2, 4, hair);
 
   if (gender === "female") {
-    // long waves
-    px(ctx, hx - 2, hy + 1, 2, 14, hair);
-    px(ctx, hx + headW, hy + 1, 2, 14, hair);
-    px(ctx, hx - 3, hy + 8, 2, 10, dark);
-    px(ctx, hx + headW + 1, hy + 8, 2, 10, dark);
-    px(ctx, hx - 2, hy + 14, 3, 3, lite);
-    px(ctx, hx + headW - 1, hy + 14, 3, 3, lite);
-    if (classId === "mage") {
-      // side-swept bang
-      px(ctx, hx, hy, 5, 3, hair);
+    // long waves + bangs
+    px(ctx, hx - 2, hy + 1, 2, 16, hair);
+    px(ctx, hx + headW, hy + 1, 2, 16, hair);
+    px(ctx, hx - 3, hy + 6, 2, 13, dark);
+    px(ctx, hx + headW + 1, hy + 6, 2, 13, dark);
+    px(ctx, hx - 2, hy + 15, 4, 3, lite);
+    px(ctx, hx + headW - 2, hy + 15, 4, 3, lite);
+    px(ctx, hx + 1, hy, 4, 2, lite); // bang
+    px(ctx, hx + headW - 4, hy + 1, 3, 2, hair);
+    if (classId === "mage" || classId === "knight") {
+      px(ctx, hx - 1, hy + 17, 3, 2, hair);
+      px(ctx, hx + headW - 1, hy + 17, 3, 2, hair);
     }
   } else {
     // short / undercut
@@ -228,15 +230,19 @@ function drawHair(ctx: CanvasRenderingContext2D, gender: Gender, classId: ClassI
 function drawHead(ctx: CanvasRenderingContext2D, gender: Gender, skin: number, hx: number, hy: number, headW: number, hurt: boolean): void {
   const jaw = gender === "male" ? headW : headW - 1;
   const jx = gender === "male" ? hx : hx + 1;
+  // outline
+  px(ctx, hx - 1, hy, 1, 9, shade(skin, -0.35));
+  px(ctx, hx + headW, hy, 1, 9, shade(skin, -0.35));
+  px(ctx, hx, hy + 10, headW, 1, shade(skin, -0.3));
   px(ctx, hx, hy, headW, 8, skin);
   px(ctx, jx, hy + 7, jaw, 3, shade(skin, -0.06));
-  px(ctx, hx, hy, headW, 2, shade(skin, 0.1));
-  // blush / cheek warmth on women
+  px(ctx, hx, hy, headW, 2, shade(skin, 0.12));
   if (gender === "female") {
-    px(ctx, hx + 1, hy + 6, 2, 1, shade(skin, 0.12), 0.7);
-    px(ctx, hx + headW - 3, hy + 6, 2, 1, shade(skin, 0.12), 0.7);
+    px(ctx, hx + 1, hy + 6, 2, 1, 0xe89aa0, 0.55);
+    px(ctx, hx + headW - 3, hy + 6, 2, 1, 0xe89aa0, 0.55);
+  } else {
+    px(ctx, hx + 1, hy + 8, headW - 2, 2, shade(skin, -0.1)); // jaw shadow
   }
-  // eyes
   const eyeY = hy + 4;
   if (hurt) {
     px(ctx, hx + 2, eyeY, 2, 1, 0x2a2030);
@@ -247,12 +253,17 @@ function drawHead(ctx: CanvasRenderingContext2D, gender: Gender, skin: number, h
     px(ctx, hx + 2, eyeY, 1, 1, 0xffffff);
     px(ctx, hx + headW - 4, eyeY, 1, 1, 0xffffff);
     if (gender === "female") {
-      px(ctx, hx + 2, eyeY - 1, 2, 1, 0x2a2030); // lash
-      px(ctx, hx + headW - 4, eyeY - 1, 2, 1, 0x2a2030);
+      px(ctx, hx + 1, eyeY - 1, 3, 1, 0x1a1420);
+      px(ctx, hx + headW - 4, eyeY - 1, 3, 1, 0x1a1420);
+      px(ctx, hx + 2, eyeY + 2, 2, 1, 0xc9a890);
     }
   }
-  // mouth
-  px(ctx, hx + Math.floor(headW / 2) - 1, hy + 8, gender === "female" ? 2 : 3, 1, shade(skin, -0.18));
+  const mx = hx + Math.floor(headW / 2) - 1;
+  if (gender === "female") {
+    px(ctx, mx, hy + 8, 2, 1, 0xc07078);
+  } else {
+    px(ctx, mx, hy + 8, 3, 1, shade(skin, -0.22));
+  }
 }
 
 function drawArmorTorso(
