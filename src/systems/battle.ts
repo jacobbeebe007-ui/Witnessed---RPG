@@ -27,8 +27,8 @@ export interface AttackResult {
   log: string;
 }
 
-/** Player basic weapon attack against an enemy. */
-export function playerAttack(c: Character, e: EnemyInstance): AttackResult {
+/** Player basic weapon attack against an enemy. `timing` scales damage (Expedition-style). */
+export function playerAttack(c: Character, e: EnemyInstance, timing = 1): AttackResult {
   const w = weapon(c);
   const roll = d20();
   const bonus = attackBonus(c);
@@ -39,7 +39,7 @@ export function playerAttack(c: Character, e: EnemyInstance): AttackResult {
   if (hit) {
     const dmgMod = scaleMod(c, primaryAttackAttr(c));
     const base = rollNotation(w.dice);
-    damage = Math.max(1, base.total + dmgMod);
+    damage = Math.max(1, Math.round((base.total + dmgMod) * timing));
     if (crit) damage += rollNotation(w.dice).total;
   }
   const log = hit
@@ -63,13 +63,13 @@ export interface SkillResult {
 }
 
 /** Resolve a skill by the player against an enemy (or self for heal/buff). */
-export function playerSkill(c: Character, skillId: string, e: EnemyInstance, focusBonus: number): SkillResult {
+export function playerSkill(c: Character, skillId: string, e: EnemyInstance, focusBonus: number, timing = 1): SkillResult {
   const sk = SKILLS[skillId];
   if (!sk) return { ok: false, damage: 0, heal: 0, log: "Nothing happens.", hits: 0 };
   const mod = scaleMod(c, sk.scale);
 
   if (sk.kind === "heal") {
-    const amt = Math.max(1, rollNotation(sk.dice).total + mod);
+    const amt = Math.max(1, Math.round((rollNotation(sk.dice).total + mod) * Math.max(1, timing * 0.85 + 0.15)));
     return { ok: true, damage: 0, heal: amt, log: `${c.name} casts ${sk.name}, restoring ${amt} HP.`, hits: 0 };
   }
   if (sk.kind === "buff") {
@@ -85,13 +85,13 @@ export function playerSkill(c: Character, skillId: string, e: EnemyInstance, foc
       const roll = d20();
       const total = roll + attackBonus(c) + focusBonus;
       if (roll === 20 || (roll !== 1 && total >= e.def.ac)) {
-        damage += Math.max(1, rollNotation(sk.dice).total + mod);
+        damage += Math.max(1, Math.round((rollNotation(sk.dice).total + mod) * timing));
         landed++;
       }
     } else {
       // magical: rarely resisted
       const resisted = chance(0.1);
-      const dmg = Math.max(1, rollNotation(sk.dice).total + mod);
+      const dmg = Math.max(1, Math.round((rollNotation(sk.dice).total + mod) * timing));
       damage += resisted ? Math.floor(dmg / 2) : dmg;
       landed++;
     }

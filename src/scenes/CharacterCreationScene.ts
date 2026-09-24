@@ -5,8 +5,8 @@ import { addAmbientBackground } from "../ui/background";
 import { ATTRIBUTES, ATTR_KEYS, baseAttributes, POINT_BUY_POOL, ATTR_MIN, ATTR_MAX, type Attributes, type AttrKey } from "../data/attributes";
 import { CLASSES, CLASS_ORDER, type ClassId, type Gender } from "../data/classes";
 import { abilityMod } from "../data/dice";
-import { charKey, ensureWalkAnim } from "../gfx/characters";
-import { createCharacter, maxHP, maxMP, armorClass, attackBonus } from "../systems/character";
+import { actorKeys } from "../gfx/characters";
+import { createCharacter, maxHP, maxMP, armorClass, attackBonus, type Character } from "../systems/character";
 import { GameState } from "../systems/GameState";
 import { WEAPONS, ARMORS } from "../data/items";
 
@@ -114,9 +114,10 @@ export class CharacterCreationScene extends Phaser.Scene {
 
     // Sprite preview on a pedestal
     this.add.ellipse(cx, 250, 90, 22, 0x000000, 0.35);
-    this.preview = this.add.sprite(cx, 210, charKey(this.classId, this.gender, 0)).setScale(4.2).setOrigin(0.5, 1);
-    ensureWalkAnim(this, this.classId, this.gender);
-    this.preview.play(`idle_${this.classId}_${this.gender}`);
+    const tmp = this.previewCharacter();
+    const keys = actorKeys(this, tmp);
+    this.preview = this.add.sprite(cx, 210, `vis_${keys.vid}_idle_0`).setScale(3.6).setOrigin(0.5, 1);
+    this.preview.play(keys.idle);
 
     this.classNameText = this.add.text(cx, 270, "", textStyle(24, COLORS.accent, { fontStyle: "bold" })).setOrigin(0.5);
     this.roleText = this.add.text(cx, 296, "", textStyle(14, COLORS.textDim)).setOrigin(0.5);
@@ -208,9 +209,13 @@ export class CharacterCreationScene extends Phaser.Scene {
     this.refresh();
   }
 
+  private previewCharacter(): Character {
+    return createCharacter(this.gender, this.classId, this.attrs, this.name || "Hero");
+  }
+
   private updatePreviewSprite(): void {
-    ensureWalkAnim(this, this.classId, this.gender);
-    this.preview.play(`idle_${this.classId}_${this.gender}`);
+    const keys = actorKeys(this, this.previewCharacter());
+    this.preview.play(keys.idle);
     (["male", "female"] as Gender[]).forEach((g) => {
       const sel = g === this.gender;
       this.genderTabs[g].setFillStyle(sel ? COLORS.border : COLORS.panelLight).setStrokeStyle(2, sel ? COLORS.accent : COLORS.border);
@@ -278,10 +283,10 @@ export class CharacterCreationScene extends Phaser.Scene {
 
   private confirm(): void {
     const finalName = this.name.trim() || DEFAULT_NAMES[this.classId];
-    GameState.player = createCharacter(this.gender, this.classId, this.attrs, finalName);
-    GameState.overworld = { x: 0, y: 0, hasSpawn: false, defeatedBosses: [] };
+    const hero = createCharacter(this.gender, this.classId, this.attrs, finalName);
+    GameState.startNew(hero);
     GameState.save();
     this.cameras.main.fadeOut(400, 0, 0, 0);
-    this.time.delayedCall(420, () => this.scene.start(SCENES.Overworld));
+    this.time.delayedCall(420, () => this.scene.start(SCENES.Dialogue, { mode: "intro" }));
   }
 }

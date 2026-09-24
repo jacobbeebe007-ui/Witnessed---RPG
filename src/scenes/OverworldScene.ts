@@ -1,13 +1,14 @@
 import Phaser from "phaser";
 import { SCENES, TILE, COLORS, GAME_WIDTH, GAME_HEIGHT } from "../config";
 import { GameState } from "../systems/GameState";
-import { charKey, ensureWalkAnim } from "../gfx/characters";
+import { actorKeys } from "../gfx/characters";
 import { enemyKey } from "../gfx/enemies";
 import { ENEMIES, ENCOUNTER_TABLES, type EnemyDef } from "../data/enemies";
 import { CLASSES } from "../data/classes";
+import { COMPANIONS, COMPANION_ORDER } from "../data/companions";
 import { makeRng } from "../systems/rng";
 import { textStyle } from "../ui/ui";
-import { maxHP, maxMP } from "../systems/character";
+import { maxHP, maxMP, makeCompanion } from "../systems/character";
 
 const MAP_W = 48;
 const MAP_H = 32;
@@ -27,17 +28,27 @@ interface BossMarker {
   tween?: Phaser.Tweens.Tween;
 }
 
+interface CompanionNpc {
+  id: string;
+  sprite: Phaser.GameObjects.Sprite;
+}
+
 export class OverworldScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
+  private followers: Phaser.GameObjects.Sprite[] = [];
+  private trail: Array<{ x: number; y: number; flip: boolean }> = [];
+  private heroKeys!: ReturnType<typeof actorKeys>;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private obstacles!: Phaser.Physics.Arcade.StaticGroup;
   private grid: TileType[][] = [];
   private towns: Town[] = [];
   private bosses: BossMarker[] = [];
+  private npcs: CompanionNpc[] = [];
   private distanceAcc = 0;
   private nextEncounter = 180;
   private nearTown: Town | null = null;
+  private nearNpc: CompanionNpc | null = null;
   private transitioning = false;
 
   // HUD
@@ -61,6 +72,8 @@ export class OverworldScene extends Phaser.Scene {
 
     this.buildMap();
     this.buildPlayer();
+    this.buildFollowers();
+    this.buildNpcs();
     this.buildBosses();
     this.buildHud();
     this.setupInput();
@@ -125,6 +138,10 @@ export class OverworldScene extends Phaser.Scene {
       this.clearArea(t.tx, t.ty, 2);
       this.grid[t.ty][t.tx] = "town";
     }
+    for (const id of COMPANION_ORDER) {
+      const def = COMPANIONS[id];
+      this.clearArea(def.tx, def.ty, 1);
+    }
     // Carve a rough main path across the map at varying y
     let py = 16;
     const prng = makeRng(SEED + 7);
@@ -176,15 +193,41 @@ export class OverworldScene extends Phaser.Scene {
   // ---- Player ----
   private buildPlayer(): void {
     const p = GameState.player!;
-    ensureWalkAnim(this, p.classId, p.gender);
+    this.heroKeys = actorKeys(this, p);
     let sx = GameState.overworld.hasSpawn ? GameState.overworld.x : 3 * TILE;
     let sy = GameState.overworld.hasSpawn ? GameState.overworld.y : 15 * TILE;
-    this.player = this.physics.add.sprite(sx, sy, charKey(p.classId, p.gender, 0)).setScale(1.4);
-    this.player.setSize(16, 10).setOffset(4, 22);
+    this.player = this.physics.add.sprite(sx, sy, `vis_${this.heroKeys.vid}_idle_0`).setScale(1.15);
+    this.player.setSize(16, 12).setOffset(10, 36);
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(10);
     this.physics.add.collider(this.player, this.obstacles);
-    this.player.play(`idle_${p.classId}_${p.gender}`);
+    this.player.play(this.heroKeys.idle);
+    this.trail = [];
+  }
+
+  private buildFollowers(): void {
+    this.followers = [];
+    GameState.party.slice(1).forEach((c, i) => {
+      const keys = actorKeys(this, c);
+      const spr = this.add.sprite(this.player.x - 12 - i * 14, this.player.y, `vis_${keys.vid}_idle_0`).setScale(1.05).setDepth(9);
+      spr.play(keys.idle);
+      spr.setData("keys", keys);
+      this.followers.push(spr);
+    });
+  }
+
+  private buildNpcs(): void {
+    this.npcs = [];
+    for (const id of COMPANION_ORDER) {
+      if (GameState.flags.recruited.includes(id)) continue;
+      const def = COMPANIONS[id];
+      const guest = makeCompanion(id);
+      const keys = actorKeys(this, guest);
+      const spr = this.add.sprite(def.tx * TILE + 16, def.ty * TILE + 8, `vis_${keys.vid}_idle_0`).setScale(1.15).setDepth(9);
+      spr.play(keys.idle);
+      this.add.text(spr.x, spr.y - 28, def.name, textStyle(11, COLORS.accent2, { fontStyle: "bold" })).setOrigin(0.5);
+      this.npcs.push({ id, sprite: spr });
+    }
   }
 
   private buildBosses(): void {
@@ -229,7 +272,11 @@ export class OverworldScene extends Phaser.Scene {
     this.toast = this.add.text(GAME_WIDTH / 2, 90, "", textStyle(20, COLORS.accent2, { fontStyle: "bold" })).setScrollFactor(0).setOrigin(0.5).setDepth(103).setAlpha(0);
     this.promptText = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 40, "", textStyle(16, COLORS.text, { backgroundColor: "#1a1226aa" })).setScrollFactor(0).setOrigin(0.5).setDepth(103).setPadding(10, 6, 10, 6).setAlpha(0);
 
-    this.add.text(GAME_WIDTH - 12, 12, "Move: Arrows / WASD   •   Enter Town: E", textStyle(12, COLORS.textDim)).setScrollFactor(0).setOrigin(1, 0).setDepth(102);
+    this.add
+      .text(GAME_WIDTH - 12, 12, "Move: Arrows / WASD   •   Talk / Town: E", textStyle(12, COLORS.textDim))
+      .setScrollFactor(0)
+      .setOrigin(1, 0)
+      .setDepth(102);
     this.updateHud();
   }
 
@@ -237,7 +284,7 @@ export class OverworldScene extends Phaser.Scene {
     const p = GameState.player!;
     const mhp = maxHP(p);
     const mmp = maxMP(p);
-    this.hudText.setText(`${p.name}  •  Lv ${p.level} ${this.className()}\nGold: ${p.gold}`);
+    this.hudText.setText(`${p.name}  •  Lv ${p.level} ${this.className()}\nGold: ${p.gold}   Party: ${GameState.party.length}/4`);
     const g = this.hpBar;
     g.clear();
     // HP
@@ -267,8 +314,22 @@ export class OverworldScene extends Phaser.Scene {
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.keys = this.input.keyboard!.addKeys("W,A,S,D,E") as Record<string, Phaser.Input.Keyboard.Key>;
     this.keys.E.on("down", () => {
-      if (this.nearTown && !this.transitioning) this.enterTown();
+      if (this.transitioning) return;
+      if (this.nearNpc) {
+        this.talkToNpc(this.nearNpc);
+        return;
+      }
+      if (this.nearTown) this.enterTown();
     });
+  }
+
+  private talkToNpc(npc: CompanionNpc): void {
+    this.transitioning = true;
+    GameState.overworld.x = this.player.x;
+    GameState.overworld.y = this.player.y;
+    GameState.overworld.hasSpawn = true;
+    GameState.save();
+    this.scene.start(SCENES.Dialogue, { mode: "recruit", companionId: npc.id });
   }
 
   private enterTown(): void {
@@ -282,7 +343,6 @@ export class OverworldScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     if (!this.player || this.transitioning || !GameState.player) return;
-    const p = GameState.player;
     const speed = 150;
     let vx = 0;
     let vy = 0;
@@ -296,14 +356,30 @@ export class OverworldScene extends Phaser.Scene {
     if (vx !== 0 && vy !== 0) body.velocity.normalize().scale(speed);
 
     const moving = vx !== 0 || vy !== 0;
-    const walkKey = `walk_${p.classId}_${p.gender}`;
-    const idleKey = `idle_${p.classId}_${p.gender}`;
+    const walkKey = this.heroKeys.walk;
+    const idleKey = this.heroKeys.idle;
     if (moving) {
       if (this.player.anims.currentAnim?.key !== walkKey) this.player.play(walkKey);
       if (vx !== 0) this.player.setFlipX(vx < 0);
+      this.trail.unshift({ x: this.player.x, y: this.player.y, flip: this.player.flipX });
+      if (this.trail.length > 80) this.trail.pop();
     } else if (this.player.anims.currentAnim?.key !== idleKey) {
       this.player.play(idleKey);
     }
+
+    this.followers.forEach((spr, i) => {
+      const slot = this.trail[10 + i * 12];
+      const keys = spr.getData("keys") as ReturnType<typeof actorKeys>;
+      if (slot) {
+        spr.x = slot.x;
+        spr.y = slot.y;
+        spr.setFlipX(slot.flip);
+        if (moving && spr.anims.currentAnim?.key !== keys.walk) spr.play(keys.walk);
+      } else if (spr.anims.currentAnim?.key !== keys.idle) {
+        spr.play(keys.idle);
+      }
+      if (!moving && spr.anims.currentAnim?.key !== keys.idle) spr.play(keys.idle);
+    });
 
     // encounter accumulation
     if (moving) {
@@ -326,8 +402,19 @@ export class OverworldScene extends Phaser.Scene {
         break;
       }
     }
-    if (this.nearTown) {
-      if (this.promptText.alpha < 1) this.promptText.setText("Press  E  to enter Town (shop & rest)").setAlpha(1);
+    this.nearNpc = null;
+    for (const n of this.npcs) {
+      const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, n.sprite.x, n.sprite.y);
+      if (d < 38) {
+        this.nearNpc = n;
+        break;
+      }
+    }
+    if (this.nearNpc) {
+      const def = COMPANIONS[this.nearNpc.id];
+      this.promptText.setText(`Press  E  to speak with ${def.name}`).setAlpha(1);
+    } else if (this.nearTown) {
+      if (this.promptText.alpha < 1) this.promptText.setText("Press  E  to enter Town (shop, rest, equip party)").setAlpha(1);
     } else if (this.promptText.alpha > 0) {
       this.promptText.setAlpha(0);
     }
