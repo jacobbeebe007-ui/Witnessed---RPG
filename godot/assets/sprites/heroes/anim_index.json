@@ -1,0 +1,136 @@
+{
+ "frame": [
+  80,
+  80
+ ],
+ "rows": [
+  "back",
+  "core",
+  "front"
+ ],
+ "anims": {
+  "idle": {
+   "start": 0,
+   "count": 6,
+   "fps": 6,
+   "loop": true
+  },
+  "run": {
+   "start": 6,
+   "count": 6,
+   "fps": 12,
+   "loop": true
+  },
+  "attack_swing": {
+   "start": 12,
+   "count": 7,
+   "fps": 14,
+   "loop": false
+  },
+  "attack_bow": {
+   "start": 19,
+   "count": 7,
+   "fps": 12,
+   "loop": false
+  },
+  "attack_staff": {
+   "start": 26,
+   "count": 7,
+   "fps": 13,
+   "loop": false
+  },
+  "cast": {
+   "start": 33,
+   "count": 6,
+   "fps": 10,
+   "loop": false
+  },
+  "hurt": {
+   "start": 39,
+   "count": 3,
+   "fps": 10,
+   "loop": false
+  },
+  "guard": {
+   "start": 42,
+   "count": 2,
+   "fps": 4,
+   "loop": true
+  },
+  "parry": {
+   "start": 44,
+   "count": 3,
+   "fps": 14,
+   "loop": false
+  },
+  "dodge": {
+   "start": 47,
+   "count": 4,
+   "fps": 14,
+   "loop": false
+  },
+  "ko": {
+   "start": 51,
+   "count": 2,
+   "fps": 6,
+   "loop": false
+  },
+  "victory": {
+   "start": 53,
+   "count": 4,
+   "fps": 5,
+   "loop": true
+  }
+ },
+ "skin_tones": [
+  "fair",
+  "olive",
+  "tan",
+  "deep"
+ ],
+ "hair_styles": [
+  "short",
+  "spiky",
+  "swept",
+  "ponytail",
+  "long",
+  "bob",
+  "braid",
+  "bun"
+ ],
+ "armors": [
+  "cloth_tunic",
+  "cloth_traveler",
+  "robe_apprentice",
+  "robe_arch",
+  "leather_scout",
+  "leather_shadow",
+  "chain_mail",
+  "chain_knight",
+  "plate_steel",
+  "plate_royal",
+  "plate_mythril",
+  "hide_barbarian",
+  "hide_warlord",
+  "ranger_jerkin",
+  "ranger_elder",
+  "vestment_acolyte",
+  "vestment_inquisitor"
+ ],
+ "weapons": [
+  "sword_iron",
+  "sword_steel",
+  "sword_flame",
+  "sword_mythril",
+  "dagger_iron",
+  "dagger_shadow",
+  "bow_hunting",
+  "bow_elven",
+  "staff_oak",
+  "staff_arcane",
+  "axe_iron",
+  "axe_war",
+  "mace_iron",
+  "mace_holy"
+ ]
+}

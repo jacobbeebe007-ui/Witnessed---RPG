@@ -1,0 +1,578 @@
+{
+ "slime": {
+  "kind": "creature",
+  "frame": 64,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   },
+   "attack": {
+    "start": 4,
+    "count": 4,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 8,
+    "count": 2,
+    "fps": 8,
+    "loop": false
+   },
+   "death": {
+    "start": 10,
+    "count": 4,
+    "fps": 6,
+    "loop": false
+   }
+  }
+ },
+ "wolf": {
+  "kind": "creature",
+  "frame": 64,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   },
+   "attack": {
+    "start": 4,
+    "count": 4,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 8,
+    "count": 2,
+    "fps": 8,
+    "loop": false
+   },
+   "death": {
+    "start": 10,
+    "count": 4,
+    "fps": 6,
+    "loop": false
+   }
+  }
+ },
+ "wraith": {
+  "kind": "creature",
+  "frame": 64,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   },
+   "attack": {
+    "start": 4,
+    "count": 4,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 8,
+    "count": 2,
+    "fps": 8,
+    "loop": false
+   },
+   "death": {
+    "start": 10,
+    "count": 4,
+    "fps": 6,
+    "loop": false
+   }
+  }
+ },
+ "golem": {
+  "kind": "creature",
+  "frame": 80,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   },
+   "attack": {
+    "start": 4,
+    "count": 4,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 8,
+    "count": 2,
+    "fps": 8,
+    "loop": false
+   },
+   "death": {
+    "start": 10,
+    "count": 4,
+    "fps": 6,
+    "loop": false
+   }
+  }
+ },
+ "myconid": {
+  "kind": "creature",
+  "frame": 64,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   },
+   "attack": {
+    "start": 4,
+    "count": 4,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 8,
+    "count": 2,
+    "fps": 8,
+    "loop": false
+   },
+   "death": {
+    "start": 10,
+    "count": 4,
+    "fps": 6,
+    "loop": false
+   }
+  }
+ },
+ "scorpion": {
+  "kind": "creature",
+  "frame": 64,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   },
+   "attack": {
+    "start": 4,
+    "count": 4,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 8,
+    "count": 2,
+    "fps": 8,
+    "loop": false
+   },
+   "death": {
+    "start": 10,
+    "count": 4,
+    "fps": 6,
+    "loop": false
+   }
+  }
+ },
+ "treant": {
+  "kind": "creature",
+  "frame": 96,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   },
+   "attack": {
+    "start": 4,
+    "count": 4,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 8,
+    "count": 2,
+    "fps": 8,
+    "loop": false
+   },
+   "death": {
+    "start": 10,
+    "count": 4,
+    "fps": 6,
+    "loop": false
+   }
+  }
+ },
+ "drake": {
+  "kind": "creature",
+  "frame": 128,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   },
+   "attack": {
+    "start": 4,
+    "count": 4,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 8,
+    "count": 2,
+    "fps": 8,
+    "loop": false
+   },
+   "death": {
+    "start": 10,
+    "count": 4,
+    "fps": 6,
+    "loop": false
+   }
+  }
+ },
+ "goblin": {
+  "kind": "humanoid",
+  "frame": 80,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 6,
+    "fps": 6,
+    "loop": true
+   },
+   "attack_swing": {
+    "start": 6,
+    "count": 7,
+    "fps": 14,
+    "loop": false
+   },
+   "attack_staff": {
+    "start": 13,
+    "count": 7,
+    "fps": 13,
+    "loop": false
+   },
+   "cast": {
+    "start": 20,
+    "count": 6,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 26,
+    "count": 3,
+    "fps": 10,
+    "loop": false
+   },
+   "ko": {
+    "start": 29,
+    "count": 2,
+    "fps": 6,
+    "loop": false
+   },
+   "victory": {
+    "start": 31,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   }
+  }
+ },
+ "bandit": {
+  "kind": "humanoid",
+  "frame": 80,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 6,
+    "fps": 6,
+    "loop": true
+   },
+   "attack_swing": {
+    "start": 6,
+    "count": 7,
+    "fps": 14,
+    "loop": false
+   },
+   "attack_staff": {
+    "start": 13,
+    "count": 7,
+    "fps": 13,
+    "loop": false
+   },
+   "cast": {
+    "start": 20,
+    "count": 6,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 26,
+    "count": 3,
+    "fps": 10,
+    "loop": false
+   },
+   "ko": {
+    "start": 29,
+    "count": 2,
+    "fps": 6,
+    "loop": false
+   },
+   "victory": {
+    "start": 31,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   }
+  }
+ },
+ "cultist": {
+  "kind": "humanoid",
+  "frame": 80,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 6,
+    "fps": 6,
+    "loop": true
+   },
+   "attack_swing": {
+    "start": 6,
+    "count": 7,
+    "fps": 14,
+    "loop": false
+   },
+   "attack_staff": {
+    "start": 13,
+    "count": 7,
+    "fps": 13,
+    "loop": false
+   },
+   "cast": {
+    "start": 20,
+    "count": 6,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 26,
+    "count": 3,
+    "fps": 10,
+    "loop": false
+   },
+   "ko": {
+    "start": 29,
+    "count": 2,
+    "fps": 6,
+    "loop": false
+   },
+   "victory": {
+    "start": 31,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   }
+  }
+ },
+ "skeleton": {
+  "kind": "humanoid",
+  "frame": 80,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 6,
+    "fps": 6,
+    "loop": true
+   },
+   "attack_swing": {
+    "start": 6,
+    "count": 7,
+    "fps": 14,
+    "loop": false
+   },
+   "attack_staff": {
+    "start": 13,
+    "count": 7,
+    "fps": 13,
+    "loop": false
+   },
+   "cast": {
+    "start": 20,
+    "count": 6,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 26,
+    "count": 3,
+    "fps": 10,
+    "loop": false
+   },
+   "ko": {
+    "start": 29,
+    "count": 2,
+    "fps": 6,
+    "loop": false
+   },
+   "victory": {
+    "start": 31,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   }
+  }
+ },
+ "harpy": {
+  "kind": "humanoid",
+  "frame": 96,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 6,
+    "fps": 6,
+    "loop": true
+   },
+   "attack_swing": {
+    "start": 6,
+    "count": 7,
+    "fps": 14,
+    "loop": false
+   },
+   "attack_staff": {
+    "start": 13,
+    "count": 7,
+    "fps": 13,
+    "loop": false
+   },
+   "cast": {
+    "start": 20,
+    "count": 6,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 26,
+    "count": 3,
+    "fps": 10,
+    "loop": false
+   },
+   "ko": {
+    "start": 29,
+    "count": 2,
+    "fps": 6,
+    "loop": false
+   },
+   "victory": {
+    "start": 31,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   }
+  }
+ },
+ "ogre": {
+  "kind": "humanoid",
+  "frame": 128,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 6,
+    "fps": 6,
+    "loop": true
+   },
+   "attack_swing": {
+    "start": 6,
+    "count": 7,
+    "fps": 14,
+    "loop": false
+   },
+   "attack_staff": {
+    "start": 13,
+    "count": 7,
+    "fps": 13,
+    "loop": false
+   },
+   "cast": {
+    "start": 20,
+    "count": 6,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 26,
+    "count": 3,
+    "fps": 10,
+    "loop": false
+   },
+   "ko": {
+    "start": 29,
+    "count": 2,
+    "fps": 6,
+    "loop": false
+   },
+   "victory": {
+    "start": 31,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   }
+  }
+ },
+ "lich": {
+  "kind": "humanoid",
+  "frame": 96,
+  "anims": {
+   "idle": {
+    "start": 0,
+    "count": 6,
+    "fps": 6,
+    "loop": true
+   },
+   "attack_swing": {
+    "start": 6,
+    "count": 7,
+    "fps": 14,
+    "loop": false
+   },
+   "attack_staff": {
+    "start": 13,
+    "count": 7,
+    "fps": 13,
+    "loop": false
+   },
+   "cast": {
+    "start": 20,
+    "count": 6,
+    "fps": 10,
+    "loop": false
+   },
+   "hurt": {
+    "start": 26,
+    "count": 3,
+    "fps": 10,
+    "loop": false
+   },
+   "ko": {
+    "start": 29,
+    "count": 2,
+    "fps": 6,
+    "loop": false
+   },
+   "victory": {
+    "start": 31,
+    "count": 4,
+    "fps": 5,
+    "loop": true
+   }
+  }
+ }
+}

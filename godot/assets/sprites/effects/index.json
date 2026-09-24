@@ -1,0 +1,58 @@
+{
+ "slash": {
+  "frames": 6,
+  "size": 64
+ },
+ "fire": {
+  "frames": 7,
+  "size": 64
+ },
+ "ice": {
+  "frames": 7,
+  "size": 64
+ },
+ "earth": {
+  "frames": 7,
+  "size": 64
+ },
+ "wind": {
+  "frames": 7,
+  "size": 64
+ },
+ "light": {
+  "frames": 7,
+  "size": 64
+ },
+ "dark": {
+  "frames": 7,
+  "size": 64
+ },
+ "heal": {
+  "frames": 7,
+  "size": 64
+ },
+ "buff": {
+  "frames": 6,
+  "size": 64
+ },
+ "poison": {
+  "frames": 6,
+  "size": 64
+ },
+ "shield": {
+  "frames": 6,
+  "size": 64
+ },
+ "hit": {
+  "frames": 4,
+  "size": 32
+ },
+ "parry": {
+  "frames": 5,
+  "size": 48
+ },
+ "stun": {
+  "frames": 4,
+  "size": 32
+ }
+}
